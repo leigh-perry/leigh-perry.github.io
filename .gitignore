@@ -1,0 +1,11 @@
+.stack-work
+.idea
+out
+*.iml
+*.lock
+.DS_Store
+_cache/
+_site/
+.stack-work/
+
+/*.cabal

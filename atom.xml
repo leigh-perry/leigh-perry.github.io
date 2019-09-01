@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <title>Leigh Perry's Blog</title>
+    <link href="https://leigh-perry.github.io/atom.xml" rel="self" />
+    <link href="https://leigh-perry.github.io" />
+    <id>https://leigh-perry.github.io/atom.xml</id>
+    <author>
+        <name>Leigh Perry</name>
+        <email>lperry.breakpoint@gmail.com</email>
+    </author>
+    <updated>2019-09-01T00:00:00Z</updated>
+    <entry>
+    <title>example post</title>
+    <link href="https://leigh-perry.github.io/posts/2019-09-01-conduction.html" />
+    <id>https://leigh-perry.github.io/posts/2019-09-01-conduction.html</id>
+    <published>2019-09-01T00:00:00Z</published>
+    <updated>2019-09-01T00:00:00Z</updated>
+    <summary type="html"><![CDATA[This is the post description]]></summary>
+</entry>
+
+</feed>
