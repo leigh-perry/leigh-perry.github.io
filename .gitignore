@@ -1,6 +1,7 @@
 .idea
 *.iml
 .DS_Store
+stack.yaml.lock
 
 # Created by https://www.gitignore.io/api/haskell
 
