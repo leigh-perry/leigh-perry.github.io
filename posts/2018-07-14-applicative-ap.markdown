@@ -1,5 +1,5 @@
 ---
-title: The mystery of Applicative.ap
+title: The mystery of Applicative's <*> operator (ap)
 ---
 
 Configuration is via a configuration library that inductively derives the configuration for known
