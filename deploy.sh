@@ -27,3 +27,5 @@ git checkout develop ; git branch -D master
 pause
 
 git push
+
+open https://leigh-perry.github.io
