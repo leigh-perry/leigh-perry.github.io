@@ -51,8 +51,8 @@ postCtx = dateField "date" "%B %e, %Y" `mappend` defaultContext
 myFeedConfiguration :: FeedConfiguration
 myFeedConfiguration =
   FeedConfiguration
-    { feedTitle = "Leigh Perry's Blog"
-    , feedDescription = "Leigh Perry's software engineering blog"
+    { feedTitle = "Ephemera - Leigh Perry's Blog"
+    , feedDescription = "Ephema is a software engineering blog by Leigh Perry"
     , feedAuthorName = "Leigh Perry"
     , feedAuthorEmail = "lperry.breakpoint@gmail.com"
     , feedRoot = "https://leigh-perry.github.io"
