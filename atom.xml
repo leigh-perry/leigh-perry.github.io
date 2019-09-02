@@ -17,5 +17,13 @@
     <updated>2019-09-01T00:00:00Z</updated>
     <summary type="html"><![CDATA[Another post from Leigh]]></summary>
 </entry>
+<entry>
+    <title>Getting started with Haskell tooling</title>
+    <link href="https://leigh-perry.github.io/posts/2019-03-01-haskell-tool-start.html" />
+    <id>https://leigh-perry.github.io/posts/2019-03-01-haskell-tool-start.html</id>
+    <published>2019-03-01T00:00:00Z</published>
+    <updated>2019-03-01T00:00:00Z</updated>
+    <summary type="html"><![CDATA[Another post from Leigh]]></summary>
+</entry>
 
 </feed>

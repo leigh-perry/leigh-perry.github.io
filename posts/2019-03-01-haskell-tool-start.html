@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>Leigh Perry's Blog - Getting started with Haskell tooling</title>
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="alternate" type="application/rss+xml" title="Leigh Perry's blog" href="./feed.xml">
+        <link rel="alternate" type="application/atom+xml" title="Leigh Perry's blog" href="./atom.xml">
+    </head>
+    <body>
+        <div id="header">
+            <div id="logo">
+                <a href="../">Leigh Perry's Blog</a>
+            </div>
+            <div id="navigation">
+                <a href="../">Home</a>
+                <a href="../about.html">About</a>
+                <a href="../contact.html">Contact</a>
+                <a href="../archive.html">Archive</a>
+            </div>
+        </div>
+
+        <div id="content">
+            <h1>Getting started with Haskell tooling</h1>
+
+            <div class="info">
+    Posted on March  1, 2019
+    
+</div>
+
+<h2 id="environment-options">Environment options</h2>
+<p>Although configuration values are typically read from environment variables, they can be read from any source that provides an instance of <code>Environment</code>:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb1-1" title="1"><span class="kw">trait</span> Environment {</a>
+<a class="sourceLine" id="cb1-2" title="2">  <span class="kw">def</span> <span class="fu">get</span>(key: String): Option[String]</a>
+<a class="sourceLine" id="cb1-3" title="3">}</a></code></pre></div>
+<p><code>Environment.fromEnvVars</code> provides normal access to environment variables. <code>Environment.fromMap(map: Map[String, String])</code> uses a prepopulated map of values, which is useful for unit testing.</p>
+<h2 id="error-reporting">Error reporting</h2>
+<p>The library is invoked with the <code>Environment</code> instance injected via Reader Monad, and returns a <code>ValidatedNec[ConfiguredError, A]</code>. Composition of <code>Configured</code> instances is done using applicative combination, eg</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb2-1" title="1">  <span class="kw">implicit</span> <span class="kw">def</span> configuredf[F[_]](<span class="kw">implicit</span> F: Applicative[F]): Configured[F, Endpoint] = (</a>
+<a class="sourceLine" id="cb2-2" title="2">    Configured[F, String].<span class="fu">withSuffix</span>(<span class="st">&quot;HOST&quot;</span>),</a>
+<a class="sourceLine" id="cb2-3" title="3">    Configured[F, Int].<span class="fu">withSuffix</span>(<span class="st">&quot;PORT&quot;</span>)</a>
+<a class="sourceLine" id="cb2-4" title="4">  ).<span class="fu">mapN</span>(Endpoint.<span class="fu">apply</span>)</a></code></pre></div>
+<p>This means that if configuration errors are present, all errors are reported, rather than bailing at the first error discovered.</p>
+
+        </div>
+        <div id="footer">
+            Site created with <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+    </body>
+</html>
