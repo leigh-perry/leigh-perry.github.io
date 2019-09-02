@@ -2,9 +2,9 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"
     xmlns:dc="http://purl.org/dc/elements/1.1/">
     <channel>
-        <title>Leigh Perry's Blog</title>
+        <title>Ephemera - Leigh Perry's Blog</title>
         <link>https://leigh-perry.github.io</link>
-        <description><![CDATA[Leigh Perry's software engineering blog]]></description>
+        <description><![CDATA[Ephema is a software engineering blog by Leigh Perry]]></description>
         <atom:link href="https://leigh-perry.github.io/feed.xml" rel="self"
                    type="application/rss+xml" />
         <lastBuildDate>Sun, 01 Sep 2019 00:00:00 UT</lastBuildDate>
