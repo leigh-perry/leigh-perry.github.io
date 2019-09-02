@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>Leigh Perry's Blog - The mystery of Applicative's <*> (ap)</title>
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="alternate" type="application/rss+xml" title="Leigh Perry's blog" href="./feed.xml">
+        <link rel="alternate" type="application/atom+xml" title="Leigh Perry's blog" href="./atom.xml">
+    </head>
+    <body>
+        <div id="header">
+            <div id="logo">
+                <a href="../">Leigh Perry's Blog</a>
+            </div>
+            <div id="navigation">
+                <a href="../">Home</a>
+                <a href="../about.html">About</a>
+                <a href="../contact.html">Contact</a>
+                <a href="../archive.html">Archive</a>
+            </div>
+        </div>
+
+        <div id="content">
+            <h1>The mystery of Applicative's <*> (ap)</h1>
+
+            <div class="info">
+    Posted on July 14, 2018
+    
+</div>
+
+<p>Configuration is via a configuration library that inductively derives the configuration for known types. It is able to decode nested classes of arbitrary complexity from key-value pairs, typically environment variables or system properties.</p>
+<p>For example, if your app has the following configuration:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb1-1" title="1">  <span class="kw">final</span> <span class="kw">case</span> <span class="kw">class</span> <span class="fu">AppConfig</span>(</a>
+<a class="sourceLine" id="cb1-2" title="2">    appName: String,</a>
+<a class="sourceLine" id="cb1-3" title="3">    endpoint: Endpoint,</a>
+<a class="sourceLine" id="cb1-4" title="4">    role: Option[AppRole],</a>
+<a class="sourceLine" id="cb1-5" title="5">    intermediates: List[TwoEndpoints],</a>
+<a class="sourceLine" id="cb1-6" title="6">  )</a>
+<a class="sourceLine" id="cb1-7" title="7"></a>
+<a class="sourceLine" id="cb1-8" title="8">  <span class="kw">final</span> <span class="kw">case</span> <span class="kw">class</span> <span class="fu">Endpoint</span>(host: String, port: Int)</a>
+<a class="sourceLine" id="cb1-9" title="9">  <span class="kw">final</span> <span class="kw">case</span> <span class="kw">class</span> <span class="fu">TwoEndpoints</span>(ep1: Endpoint, ep2: Endpoint)</a>
+<a class="sourceLine" id="cb1-10" title="10"></a>
+<a class="sourceLine" id="cb1-11" title="11">  <span class="co">// A String newtype</span></a>
+<a class="sourceLine" id="cb1-12" title="12">  <span class="kw">final</span> <span class="kw">case</span> <span class="kw">class</span> <span class="fu">AppRole</span>(value: String) <span class="kw">extends</span> AnyVal</a></code></pre></div>
+<p>then loading it via:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb2-1" title="1">      Configured[IO, AppConfig]</a>
+<a class="sourceLine" id="cb2-2" title="2">        .<span class="fu">value</span>(<span class="st">&quot;MYAPP&quot;</span>)</a>
+<a class="sourceLine" id="cb2-3" title="3">        .<span class="fu">run</span>(Environment.<span class="fu">fromEnvVars</span>)</a></code></pre></div>
+<p>with the environment variables:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1"><span class="bu">export</span> <span class="va">MYAPP_APP_NAME=</span>someAppName</a>
+<a class="sourceLine" id="cb3-2" title="2"><span class="bu">export</span> <span class="va">MYAPP_ENDPOINT_HOST=</span>12.23.34.45</a>
+<a class="sourceLine" id="cb3-3" title="3"><span class="bu">export</span> <span class="va">MYAPP_ENDPOINT_PORT=</span>6789</a>
+<a class="sourceLine" id="cb3-4" title="4"><span class="bu">export</span> <span class="va">MYAPP_ROLE_OPT=</span>somerole</a>
+<a class="sourceLine" id="cb3-5" title="5"><span class="bu">export</span> <span class="va">MYAPP_INTERMEDIATE_COUNT=</span>2</a>
+<a class="sourceLine" id="cb3-6" title="6"><span class="bu">export</span> <span class="va">MYAPP_INTERMEDIATE_0_EP1_HOST=</span>11.11.11.11</a>
+<a class="sourceLine" id="cb3-7" title="7"><span class="bu">export</span> <span class="va">MYAPP_INTERMEDIATE_0_EP1_PORT=</span>6790</a>
+<a class="sourceLine" id="cb3-8" title="8"><span class="bu">export</span> <span class="va">MYAPP_INTERMEDIATE_0_EP2_HOST=</span>22.22.22.22</a>
+<a class="sourceLine" id="cb3-9" title="9"><span class="bu">export</span> <span class="va">MYAPP_INTERMEDIATE_0_EP2_PORT=</span>6791</a>
+<a class="sourceLine" id="cb3-10" title="10"><span class="bu">export</span> <span class="va">MYAPP_INTERMEDIATE_1_EP1_HOST=</span>33.33.33.33</a>
+<a class="sourceLine" id="cb3-11" title="11"><span class="bu">export</span> <span class="va">MYAPP_INTERMEDIATE_1_EP1_PORT=</span>6792</a>
+<a class="sourceLine" id="cb3-12" title="12"><span class="bu">export</span> <span class="va">MYAPP_INTERMEDIATE_1_EP2_HOST=</span>44.44.44.44</a>
+<a class="sourceLine" id="cb3-13" title="13"><span class="bu">export</span> <span class="va">MYAPP_INTERMEDIATE_1_EP2_PORT=</span>6793</a></code></pre></div>
+<p>would yield the following instance of <code>AppConfig</code>:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb4-1" title="1">    <span class="fu">AppConfig</span>(</a>
+<a class="sourceLine" id="cb4-2" title="2">      <span class="st">&quot;someAppName&quot;</span>,</a>
+<a class="sourceLine" id="cb4-3" title="3">      <span class="fu">Endpoint</span>(<span class="st">&quot;12.23.34.45&quot;</span>, <span class="dv">6789</span>),</a>
+<a class="sourceLine" id="cb4-4" title="4">      Some(<span class="fu">AppRole</span>(<span class="st">&quot;somerole&quot;</span>),</a>
+<a class="sourceLine" id="cb4-5" title="5">      List(</a>
+<a class="sourceLine" id="cb4-6" title="6">        <span class="fu">TwoEndpoints</span>(</a>
+<a class="sourceLine" id="cb4-7" title="7">          <span class="fu">Endpoint</span>(<span class="st">&quot;11.11.11.11&quot;</span>, <span class="dv">6790</span>),</a>
+<a class="sourceLine" id="cb4-8" title="8">          <span class="fu">Endpoint</span>(<span class="st">&quot;22.22.22.22&quot;</span>, <span class="dv">6791</span>)</a>
+<a class="sourceLine" id="cb4-9" title="9">        ),</a>
+<a class="sourceLine" id="cb4-10" title="10">        <span class="fu">TwoEndpoints</span>(</a>
+<a class="sourceLine" id="cb4-11" title="11">          <span class="fu">Endpoint</span>(<span class="st">&quot;33.33.33.33&quot;</span>, <span class="dv">6792</span>),</a>
+<a class="sourceLine" id="cb4-12" title="12">          <span class="fu">Endpoint</span>(<span class="st">&quot;44.44.44.44&quot;</span>, <span class="dv">6793</span>)</a>
+<a class="sourceLine" id="cb4-13" title="13">        )</a>
+<a class="sourceLine" id="cb4-14" title="14">      )</a>
+<a class="sourceLine" id="cb4-15" title="15">    )</a></code></pre></div>
+<p>Note: to support this, you need to also tell the library how to decode each component data item by defining an implicit instance, usually in the companion object of each type as follows:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb5-1" title="1">  <span class="kw">object</span> AppConfig {</a>
+<a class="sourceLine" id="cb5-2" title="2">    <span class="kw">implicit</span> <span class="kw">def</span> configured[F[_] : Monad]: Configured[F, AppConfig] = (</a>
+<a class="sourceLine" id="cb5-3" title="3">      Configured[F, String].<span class="fu">withSuffix</span>(<span class="st">&quot;APP_NAME&quot;</span>),</a>
+<a class="sourceLine" id="cb5-4" title="4">      Configured[F, Endpoint].<span class="fu">withSuffix</span>(<span class="st">&quot;ENDPOINT&quot;</span>),</a>
+<a class="sourceLine" id="cb5-5" title="5">      Configured[F, Option[AppRole]].<span class="fu">withSuffix</span>(<span class="st">&quot;ROLE&quot;</span>),</a>
+<a class="sourceLine" id="cb5-6" title="6">      Configured[F, List[TwoEndpoints]].<span class="fu">withSuffix</span>(<span class="st">&quot;INTERMEDIATE&quot;</span>),</a>
+<a class="sourceLine" id="cb5-7" title="7">    ).<span class="fu">mapN</span>(AppConfig.<span class="fu">apply</span>)</a>
+<a class="sourceLine" id="cb5-8" title="8">  }</a>
+<a class="sourceLine" id="cb5-9" title="9"></a>
+<a class="sourceLine" id="cb5-10" title="10"><span class="kw">object</span> Endpoint {</a>
+<a class="sourceLine" id="cb5-11" title="11">  <span class="kw">implicit</span> <span class="kw">def</span> configuredf[F[_]](<span class="kw">implicit</span> F: Applicative[F]): Configured[F, Endpoint] = (</a>
+<a class="sourceLine" id="cb5-12" title="12">    Configured[F, String].<span class="fu">withSuffix</span>(<span class="st">&quot;HOST&quot;</span>),</a>
+<a class="sourceLine" id="cb5-13" title="13">    Configured[F, Int].<span class="fu">withSuffix</span>(<span class="st">&quot;PORT&quot;</span>)</a>
+<a class="sourceLine" id="cb5-14" title="14">  ).<span class="fu">mapN</span>(Endpoint.<span class="fu">apply</span>)</a>
+<a class="sourceLine" id="cb5-15" title="15">}</a>
+<a class="sourceLine" id="cb5-16" title="16"></a>
+<a class="sourceLine" id="cb5-17" title="17"><span class="kw">object</span> TwoEndpoints {</a>
+<a class="sourceLine" id="cb5-18" title="18">  <span class="kw">implicit</span> <span class="kw">def</span> configuredf[F[_]](<span class="kw">implicit</span> F: Applicative[F]): Configured[F, TwoEndpoints] = (</a>
+<a class="sourceLine" id="cb5-19" title="19">    Configured[F, Endpoint].<span class="fu">withSuffix</span>(<span class="st">&quot;EP1&quot;</span>),</a>
+<a class="sourceLine" id="cb5-20" title="20">    Configured[F, Endpoint].<span class="fu">withSuffix</span>(<span class="st">&quot;EP2&quot;</span>)</a>
+<a class="sourceLine" id="cb5-21" title="21">  ).<span class="fu">mapN</span>(TwoEndpoints.<span class="fu">apply</span>)</a>
+<a class="sourceLine" id="cb5-22" title="22">}</a>
+<a class="sourceLine" id="cb5-23" title="23"></a>
+<a class="sourceLine" id="cb5-24" title="24"><span class="kw">object</span> AppRole {</a>
+<a class="sourceLine" id="cb5-25" title="25">  <span class="kw">implicit</span> <span class="kw">def</span> conversion: Conversion[AppRole] =</a>
+<a class="sourceLine" id="cb5-26" title="26">    Conversion[String].<span class="fu">map</span>(AppRole.<span class="fu">apply</span>)</a>
+<a class="sourceLine" id="cb5-27" title="27">}</a></code></pre></div>
+<h2 id="naming">Naming</h2>
+<p>Each data item is retrieved from a key-value pair (typically an environment variable, with the key being the environment variable name). Key naming reflects the structure of the configuration case class. In the example above, configuration was loaded via</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb6-1" title="1">      Configured[IO, AppConfig]</a>
+<a class="sourceLine" id="cb6-2" title="2">        .<span class="fu">value</span>(<span class="st">&quot;MYAPP&quot;</span>)</a></code></pre></div>
+<p>so all keys will begin with <code>MYAPP_</code>. The <code>Configured</code> typeclass instance for <code>AppConfig</code>, defined in <code>AppConfig</code>’s companion object loads the appName field using</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb7-1" title="1">      Configured[F, String].<span class="fu">withSuffix</span>(<span class="st">&quot;APP_NAME&quot;</span>)</a></code></pre></div>
+<p>so the key <code>MYAPP_APP_NAME</code> is used to load the value <code>someAppName</code>. The key name is formed by concatenating the overall name <code>MYAPP</code> with the suffix fragment <code>APP_NAME</code>. When assembling a composite key name, the fragments are separated by <code>_</code>, yielding <code>MYAPP_APP_NAME</code>.</p>
+<p>By virtue of the inductive derivation of <code>Configured</code> typeclass instances for each configuration element, configuration classes can contain primitive types, nested case classes, and other Scala constructs like <code>List</code>, <code>Option</code>, and <code>Either</code>.</p>
+<h2 id="supported-types">Supported types</h2>
+<h3 id="primitives">Primitives</h3>
+<h3 id="list">List</h3>
+<p>List configuration consists of a count value plus a value for every element of the list. The count field has suffix fragment <code>COUNT</code>, and each field has suffix fragment specifying the index within the list, starting from 0.</p>
+<p>In the example above,</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb8-1" title="1"><span class="bu">export</span> <span class="va">MYAPP_INTERMEDIATE_COUNT=</span>2</a>
+<a class="sourceLine" id="cb8-2" title="2"><span class="bu">export</span> <span class="va">MYAPP_INTERMEDIATE_0_EP1_HOST=</span>11.11.11.11</a>
+<a class="sourceLine" id="cb8-3" title="3"><span class="bu">export</span> <span class="va">MYAPP_INTERMEDIATE_0_EP1_PORT=</span>6790</a>
+<a class="sourceLine" id="cb8-4" title="4"><span class="bu">export</span> <span class="va">MYAPP_INTERMEDIATE_0_EP2_HOST=</span>22.22.22.22</a>
+<a class="sourceLine" id="cb8-5" title="5"><span class="bu">export</span> <span class="va">MYAPP_INTERMEDIATE_0_EP2_PORT=</span>6791</a>
+<a class="sourceLine" id="cb8-6" title="6"><span class="bu">export</span> <span class="va">MYAPP_INTERMEDIATE_1_EP1_HOST=</span>33.33.33.33</a>
+<a class="sourceLine" id="cb8-7" title="7"><span class="bu">export</span> <span class="va">MYAPP_INTERMEDIATE_1_EP1_PORT=</span>6792</a>
+<a class="sourceLine" id="cb8-8" title="8"><span class="bu">export</span> <span class="va">MYAPP_INTERMEDIATE_1_EP2_HOST=</span>44.44.44.44</a>
+<a class="sourceLine" id="cb8-9" title="9"><span class="bu">export</span> <span class="va">MYAPP_INTERMEDIATE_1_EP2_PORT=</span>6793</a></code></pre></div>
+<p>yields</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb9-1" title="1">      List(</a>
+<a class="sourceLine" id="cb9-2" title="2">        <span class="fu">TwoEndpoints</span>(</a>
+<a class="sourceLine" id="cb9-3" title="3">          <span class="fu">Endpoint</span>(<span class="st">&quot;11.11.11.11&quot;</span>, <span class="dv">6790</span>),</a>
+<a class="sourceLine" id="cb9-4" title="4">          <span class="fu">Endpoint</span>(<span class="st">&quot;22.22.22.22&quot;</span>, <span class="dv">6791</span>)</a>
+<a class="sourceLine" id="cb9-5" title="5">        ),</a>
+<a class="sourceLine" id="cb9-6" title="6">        <span class="fu">TwoEndpoints</span>(</a>
+<a class="sourceLine" id="cb9-7" title="7">          <span class="fu">Endpoint</span>(<span class="st">&quot;33.33.33.33&quot;</span>, <span class="dv">6792</span>),</a>
+<a class="sourceLine" id="cb9-8" title="8">          <span class="fu">Endpoint</span>(<span class="st">&quot;44.44.44.44&quot;</span>, <span class="dv">6793</span>)</a>
+<a class="sourceLine" id="cb9-9" title="9">        )</a>
+<a class="sourceLine" id="cb9-10" title="10">      )</a></code></pre></div>
+<h3 id="option">Option</h3>
+<p><code>Option</code> configuration uses the <code>OPT</code> suffix fragment.</p>
+<p>In the example above,</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb10-1" title="1"><span class="bu">export</span> <span class="va">MYAPP_ROLE_OPT=</span>somerole</a></code></pre></div>
+<p>yields</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb11-1" title="1">      Some(<span class="fu">AppRole</span>(<span class="st">&quot;somerole&quot;</span>)</a></code></pre></div>
+<p>If no value is present for <code>MYAPP_ROLE_OPT</code>, the value is <code>None</code>.</p>
+<h3 id="either">Either</h3>
+<p>Similar to <code>Option</code>, <code>Either</code> configuration uses two suffix fragments: <code>C1</code> for a <code>Left</code> value, and <code>C2</code> for a <code>Right</code> value.</p>
+<p>For example, if your app has the following configuration:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb12-1" title="1">  <span class="kw">final</span> <span class="kw">case</span> <span class="kw">class</span> <span class="fu">EitherConfig</span>(</a>
+<a class="sourceLine" id="cb12-2" title="2">    choice: Either[String, Endpoint]</a>
+<a class="sourceLine" id="cb12-3" title="3">  )</a>
+<a class="sourceLine" id="cb12-4" title="4"></a>
+<a class="sourceLine" id="cb12-5" title="5">  <span class="kw">object</span> EitherConfig {</a>
+<a class="sourceLine" id="cb12-6" title="6">    <span class="kw">implicit</span> <span class="kw">def</span> configured[F[_] : Monad]: Configured[F, EitherConfig] =</a>
+<a class="sourceLine" id="cb12-7" title="7">      Configured[F, Either[String, Endpoint]].<span class="fu">withSuffix</span>(<span class="st">&quot;CHOICE&quot;</span>)</a>
+<a class="sourceLine" id="cb12-8" title="8">      .<span class="fu">map</span>(EitherConfig.<span class="fu">apply</span>)</a>
+<a class="sourceLine" id="cb12-9" title="9">  }</a></code></pre></div>
+<p>then loading it via:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb13-1" title="1">      Configured[IO, AppConfig]</a>
+<a class="sourceLine" id="cb13-2" title="2">        .<span class="fu">value</span>(<span class="st">&quot;MYAPP&quot;</span>)</a>
+<a class="sourceLine" id="cb13-3" title="3">        .<span class="fu">run</span>(Environment.<span class="fu">fromEnvVars</span>)</a></code></pre></div>
+<p>with the environment variables:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb14-1" title="1"><span class="bu">export</span> <span class="va">MYAPP_CHOICE_C1=</span>someAppName</a></code></pre></div>
+<p>would yield the following instance of <code>EitherConfig</code>:</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb15-1" title="1">      <span class="fu">EitherConfig</span>(</a>
+<a class="sourceLine" id="cb15-2" title="2">        <span class="fu">Left</span>(<span class="st">&quot;someAppName&quot;</span>)</a>
+<a class="sourceLine" id="cb15-3" title="3">      )</a></code></pre></div>
+<p>but with the environment variables:</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb16-1" title="1"><span class="bu">export</span> <span class="va">MYAPP_CHOICE_C2_HOST=</span>12.23.34.45</a>
+<a class="sourceLine" id="cb16-2" title="2"><span class="bu">export</span> <span class="va">MYAPP_CHOICE_C2_PORT=</span>6789</a></code></pre></div>
+<p>would yield the following instance of <code>EitherConfig</code>:</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb17-1" title="1">      <span class="fu">EitherConfig</span>(</a>
+<a class="sourceLine" id="cb17-2" title="2">        <span class="fu">Right</span>(<span class="fu">Endpoint</span>(<span class="st">&quot;12.23.34.45,6789&quot;</span>))</a>
+<a class="sourceLine" id="cb17-3" title="3">      )</a></code></pre></div>
+<h2 id="supporting-new-primitive-types">Supporting new primitive types</h2>
+<p>A <code>Configured</code> typeclass instance is available for any type that has an instance of the <code>Conversion</code> typeclass. To support another primitive type, such as a Java enum, create an instance of <code>Conversion</code>.</p>
+<p>For example, for AWS’s <code>Regions</code> enum:</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb18-1" title="1"><span class="kw">object</span> ConfigSupportAws {</a>
+<a class="sourceLine" id="cb18-2" title="2">  <span class="kw">implicit</span> <span class="kw">def</span> conversionRegion: Conversion[Regions] =</a>
+<a class="sourceLine" id="cb18-3" title="3">    (s: String) =&gt; Either.<span class="fu">catchNonFatal</span>(Regions.<span class="fu">fromName</span>(s))</a>
+<a class="sourceLine" id="cb18-4" title="4">      .<span class="fu">leftMap</span>(_ =&gt; s<span class="st">&quot;invalid region $s&quot;</span>)</a>
+<a class="sourceLine" id="cb18-5" title="5"></a>
+<a class="sourceLine" id="cb18-6" title="6">  <span class="kw">def</span> configuredRegion[F[_]](defaultRegion: Regions)(<span class="kw">implicit</span> F: Applicative[F]): Configured[F, Regions] =</a>
+<a class="sourceLine" id="cb18-7" title="7">    Configured[F, Option[Regions]]</a>
+<a class="sourceLine" id="cb18-8" title="8">      .<span class="fu">map</span>(_.<span class="fu">getOrElse</span>(defaultRegion))</a>
+<a class="sourceLine" id="cb18-9" title="9">}</a></code></pre></div>
+<h3 id="supporting-newtypes">Supporting newtypes</h3>
+<p>Newtypes that wrap an underlying type can easily be created by converting the underlying type and mapping to the newtype.</p>
+<p>For example:</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb19-1" title="1">  <span class="kw">final</span> <span class="kw">case</span> <span class="kw">class</span> <span class="fu">Latitude</span>(value: Double) <span class="kw">extends</span> AnyVal</a>
+<a class="sourceLine" id="cb19-2" title="2"></a>
+<a class="sourceLine" id="cb19-3" title="3">  <span class="kw">object</span> Latitude {</a>
+<a class="sourceLine" id="cb19-4" title="4">    <span class="kw">implicit</span> <span class="kw">def</span> conversion: Conversion[Latitude] =</a>
+<a class="sourceLine" id="cb19-5" title="5">      Conversion[Double].<span class="fu">map</span>(Latitude.<span class="fu">apply</span>)</a>
+<a class="sourceLine" id="cb19-6" title="6">  }</a></code></pre></div>
+<h2 id="supporting-other-effects">Supporting other effects</h2>
+<p><code>List</code>, <code>Option</code>, and <code>Either</code> are currently supported. You can add support to your configuration module for other effects such as <code>NonEmptyList</code> etc.</p>
+<h2 id="environment-options">Environment options</h2>
+<p>Although configuration values are typically read from environment variables, they can be read from any source that provides an instance of <code>Environment</code>:</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb20-1" title="1"><span class="kw">trait</span> Environment {</a>
+<a class="sourceLine" id="cb20-2" title="2">  <span class="kw">def</span> <span class="fu">get</span>(key: String): Option[String]</a>
+<a class="sourceLine" id="cb20-3" title="3">}</a></code></pre></div>
+<p><code>Environment.fromEnvVars</code> provides normal access to environment variables. <code>Environment.fromMap(map: Map[String, String])</code> uses a prepopulated map of values, which is useful for unit testing.</p>
+<h2 id="error-reporting">Error reporting</h2>
+<p>The library is invoked with the <code>Environment</code> instance injected via Reader Monad, and returns a <code>ValidatedNec[ConfiguredError, A]</code>. Composition of <code>Configured</code> instances is done using applicative combination, eg</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb21-1" title="1">  <span class="kw">implicit</span> <span class="kw">def</span> configuredf[F[_]](<span class="kw">implicit</span> F: Applicative[F]): Configured[F, Endpoint] = (</a>
+<a class="sourceLine" id="cb21-2" title="2">    Configured[F, String].<span class="fu">withSuffix</span>(<span class="st">&quot;HOST&quot;</span>),</a>
+<a class="sourceLine" id="cb21-3" title="3">    Configured[F, Int].<span class="fu">withSuffix</span>(<span class="st">&quot;PORT&quot;</span>)</a>
+<a class="sourceLine" id="cb21-4" title="4">  ).<span class="fu">mapN</span>(Endpoint.<span class="fu">apply</span>)</a></code></pre></div>
+<p>This means that if configuration errors are present, all errors are reported, rather than bailing at the first error discovered.</p>
+
+        </div>
+        <div id="footer">
+            Site created with <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+    </body>
+</html>
