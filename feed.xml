@@ -17,11 +17,27 @@
     <dc:creator>Leigh Perry</dc:creator>
 </item>
 <item>
+    <title>Introduction to fix point</title>
+    <link>https://leigh-perry.github.io/posts/2019-04-03-fix-intro.html</link>
+    <description><![CDATA[Another post from Leigh]]></description>
+    <pubDate>Wed, 03 Apr 2019 00:00:00 UT</pubDate>
+    <guid>https://leigh-perry.github.io/posts/2019-04-03-fix-intro.html</guid>
+    <dc:creator>Leigh Perry</dc:creator>
+</item>
+<item>
     <title>Getting started with Haskell tooling</title>
     <link>https://leigh-perry.github.io/posts/2019-03-01-haskell-tool-start.html</link>
     <description><![CDATA[Another post from Leigh]]></description>
     <pubDate>Fri, 01 Mar 2019 00:00:00 UT</pubDate>
     <guid>https://leigh-perry.github.io/posts/2019-03-01-haskell-tool-start.html</guid>
+    <dc:creator>Leigh Perry</dc:creator>
+</item>
+<item>
+    <title>Generating functions in Scalacheck</title>
+    <link>https://leigh-perry.github.io/posts/2018-11-23-generating-functions.html</link>
+    <description><![CDATA[Another post from Leigh]]></description>
+    <pubDate>Fri, 23 Nov 2018 00:00:00 UT</pubDate>
+    <guid>https://leigh-perry.github.io/posts/2018-11-23-generating-functions.html</guid>
     <dc:creator>Leigh Perry</dc:creator>
 </item>
 <item>
