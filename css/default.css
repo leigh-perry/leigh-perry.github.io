@@ -4,12 +4,13 @@ body {
   width: 600px;
   font-family: Calibri, Verdana, Arial, sans-serif;
   font-size: 10.5pt;
-  line-height: 150%;
+  line-height: 166%;
   color: #606460;
 }
 
 code {
   font-family: Andale Mono, monospace;
+  line-height: 100%;
 }
 
 div.sourceCode {
