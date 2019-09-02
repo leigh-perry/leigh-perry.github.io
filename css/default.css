@@ -7,6 +7,14 @@ body {
   color: #606460;
 }
 
+code {
+  font-family: Andale Mono, monospace;
+}
+
+div.sourceCode {
+  background-color: #f6f6f6;
+}
+
 div#header {
   border-bottom: 2px solid black;
   margin-bottom: 30px;
