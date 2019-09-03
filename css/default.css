@@ -10,6 +10,7 @@ body {
 
 code {
   font-family: Andale Mono, monospace
+  font-size: 10pt;
 }
 
 div.sourceCode {
@@ -27,7 +28,7 @@ div#header {
 div#logo a {
   color: #C27040;
   float: left;
-  font-size: 12pt;
+  font-size: 14pt;
   font-weight: bold;
   text-decoration: none
 }
@@ -38,7 +39,7 @@ div#header #navigation {
 
 div#header #navigation a {
   color: #C27040;
-  font-size: 12pt;
+  font-size: 11pt;
   font-weight: bold;
   margin-left: 12px;
   text-decoration: none;
