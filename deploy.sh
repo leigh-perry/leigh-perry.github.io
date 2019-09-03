@@ -20,10 +20,6 @@ pause
 
 cp -a _site/. .
 
-# TODO hakyll
-mkdir _site/site
-cp site/favicon.ico _site/site/
-
 git config user.name "leigh-perry" ; git config user.email "lperry.breakpoint@gmail.com" ; gs ; gqc "Publish"
 git push origin master:master
 pause
