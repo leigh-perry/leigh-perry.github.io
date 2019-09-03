@@ -1,5 +1,5 @@
 ---
-title: Converting fix function to Fix data structure
+title: Converting Haskell's simple fix function to Scala
 ---
 
 Configuration is via a configuration library that inductively derives the configuration for known
