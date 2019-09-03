@@ -18,9 +18,33 @@
     <summary type="html"><![CDATA[Another post from Leigh]]></summary>
 </entry>
 <entry>
-    <title>Introduction to fix point</title>
-    <link href="https://leigh-perry.github.io/posts/2019-04-03-fix-intro.html" />
-    <id>https://leigh-perry.github.io/posts/2019-04-03-fix-intro.html</id>
+    <title>Applicative composition of monoids</title>
+    <link href="https://leigh-perry.github.io/posts/2019-06-18-applicative-monoid-composition.html" />
+    <id>https://leigh-perry.github.io/posts/2019-06-18-applicative-monoid-composition.html</id>
+    <published>2019-06-18T00:00:00Z</published>
+    <updated>2019-06-18T00:00:00Z</updated>
+    <summary type="html"><![CDATA[Another post from Leigh]]></summary>
+</entry>
+<entry>
+    <title>Monoids for multiple aggregations in a single pass</title>
+    <link href="https://leigh-perry.github.io/posts/2019-06-08-multimonoids.html" />
+    <id>https://leigh-perry.github.io/posts/2019-06-08-multimonoids.html</id>
+    <published>2019-06-08T00:00:00Z</published>
+    <updated>2019-06-08T00:00:00Z</updated>
+    <summary type="html"><![CDATA[Another post from Leigh]]></summary>
+</entry>
+<entry>
+    <title>Converting fix function to Fix data structure</title>
+    <link href="https://leigh-perry.github.io/posts/2019-04-23-fix-reification.html" />
+    <id>https://leigh-perry.github.io/posts/2019-04-23-fix-reification.html</id>
+    <published>2019-04-23T00:00:00Z</published>
+    <updated>2019-04-23T00:00:00Z</updated>
+    <summary type="html"><![CDATA[Another post from Leigh]]></summary>
+</entry>
+<entry>
+    <title>Converting fix function to Fix data structure</title>
+    <link href="https://leigh-perry.github.io/posts/2019-04-03-fix-haskell-to-scala.html" />
+    <id>https://leigh-perry.github.io/posts/2019-04-03-fix-haskell-to-scala.html</id>
     <published>2019-04-03T00:00:00Z</published>
     <updated>2019-04-03T00:00:00Z</updated>
     <summary type="html"><![CDATA[Another post from Leigh]]></summary>
