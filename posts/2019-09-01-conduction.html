@@ -68,7 +68,7 @@
 <p>In writing the library, I had some ambitions.</p>
 <ul>
 <li>I wanted it to be pure-functional.</li>
-<li>Extensibility. Allow the user to
+<li>It should be extensibility – allow the user to:
 <ul>
 <li>add new primitive types,</li>
 <li>add new complex types,</li>
@@ -84,7 +84,13 @@
 <div class="sourceCode" id="cb4"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb4-1" title="1"><span class="kw">trait</span> Configured[A] {</a>
 <a class="sourceLine" id="cb4-2" title="2">  <span class="kw">def</span> <span class="fu">value</span>(env: Environment, name: String): ValidatedNec[ConfiguredError, A]</a>
 <a class="sourceLine" id="cb4-3" title="3">}</a></code></pre></div>
-<p>This trait covers most of the aims of the library. - It provides the basic mechanism of reading a value of type <code>A</code>. - It defines a family of configuration errors in the ADT <code>ConfiguredError</code>. - It accumulates multiple errors via the <code>ValidatedNec[ConfiguredError, A]</code> return value. - It allows the value to be read from a generalised input <code>Environment</code>.</p>
+<p>This trait covers most of the aims of the library.</p>
+<ul>
+<li>It provides the basic mechanism of reading a value of type <code>A</code>.</li>
+<li>It defines a family of configuration errors in the ADT <code>ConfiguredError</code>.</li>
+<li>It accumulates multiple errors via the <code>ValidatedNec[ConfiguredError, A]</code> return value.</li>
+<li>It allows the value to be read from a generalised input <code>Environment</code>.</li>
+</ul>
 <p>I provided a set of standard instances for out-of-the-box supported primitive types:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb5-1" title="1"><span class="kw">object</span> Configured {</a>
 <a class="sourceLine" id="cb5-2" title="2">  <span class="kw">implicit</span> <span class="kw">val</span> configuredInt: Configured[Int] =</a>
