@@ -78,11 +78,70 @@
 <li>Provide complete validation. If there are multiple configuration errors, report them all rather than bailing at the first.</li>
 </ul>
 <h1 id="implementation">Implementation</h1>
-<p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using ‘Content here, content here’, making it look like readable English.</p>
+<p>A standard approach for extensibility in functional programming is the combination of typeclasses and inductive derivation.</p>
 <h2 id="first-cut">First cut</h2>
-<p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using ‘Content here, content here’, making it look like readable English.</p>
+<p>I started by defining the typeclass:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb4-1" title="1"><span class="kw">trait</span> Configured[A] {</a>
+<a class="sourceLine" id="cb4-2" title="2">  <span class="kw">def</span> <span class="fu">value</span>(env: Environment, name: String): ValidatedNec[ConfiguredError, A]</a>
+<a class="sourceLine" id="cb4-3" title="3">}</a></code></pre></div>
+<p>This trait covers most of the aims of the library. - It provides the basic mechanism of reading a value of type <code>A</code>. - It defines a family of configuration errors in the ADT <code>ConfiguredError</code>. - It accumulates multiple errors via the <code>ValidatedNec[ConfiguredError, A]</code> return value. - It allows the value to be read from a generalised input <code>Environment</code>.</p>
+<p>I provided a set of standard instances for out-of-the-box supported primitive types:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb5-1" title="1"><span class="kw">object</span> Configured {</a>
+<a class="sourceLine" id="cb5-2" title="2">  <span class="kw">implicit</span> <span class="kw">val</span> configuredInt: Configured[Int] =</a>
+<a class="sourceLine" id="cb5-3" title="3">    <span class="kw">new</span> Configured[Int] {</a>
+<a class="sourceLine" id="cb5-4" title="4">      <span class="kw">override</span> <span class="kw">def</span> <span class="fu">value</span>(env: Environment, name: String): ValidatedNec[ConfiguredError, Int] =</a>
+<a class="sourceLine" id="cb5-5" title="5">        <span class="co">// implementation elided</span></a>
+<a class="sourceLine" id="cb5-6" title="6">    }</a>
+<a class="sourceLine" id="cb5-7" title="7"></a>
+<a class="sourceLine" id="cb5-8" title="8">  <span class="co">// ...</span></a></code></pre></div>
+<p>I then added some inductively derived types, meaning types that can be built out of data types that already had a <code>Configured</code> instance:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb6-1" title="1"><span class="kw">object</span> Configured {</a>
+<a class="sourceLine" id="cb6-2" title="2">  <span class="co">// ...</span></a>
+<a class="sourceLine" id="cb6-3" title="3"></a>
+<a class="sourceLine" id="cb6-4" title="4">  <span class="kw">implicit</span> <span class="kw">def</span> `Configured <span class="kw">for</span> Option`[A: Configured]: Configured[Option[A]] =</a>
+<a class="sourceLine" id="cb6-5" title="5">    <span class="kw">new</span> Configured[Option[A]] {</a>
+<a class="sourceLine" id="cb6-6" title="6">      <span class="kw">override</span> <span class="kw">def</span> <span class="fu">value</span>(env: Environment, name: String): ValidatedNec[ConfiguredError, Option[A]] =</a>
+<a class="sourceLine" id="cb6-7" title="7">        Configured[A]</a>
+<a class="sourceLine" id="cb6-8" title="8">          .<span class="fu">value</span>(env, s<span class="st">&quot;${name}_OPT&quot;</span>)</a>
+<a class="sourceLine" id="cb6-9" title="9">          .<span class="fu">fold</span>(</a>
+<a class="sourceLine" id="cb6-10" title="10">            c =&gt; <span class="kw">if</span> (c.<span class="fu">forall</span>(_.<span class="fu">isInstanceOf</span>[ConfiguredError.<span class="fu">MissingValue</span>])) None.<span class="fu">validNec</span> <span class="kw">else</span> c.<span class="fu">invalid</span>,</a>
+<a class="sourceLine" id="cb6-11" title="11">            a =&gt; a.<span class="fu">some</span>.<span class="fu">valid</span></a>
+<a class="sourceLine" id="cb6-12" title="12">          )</a>
+<a class="sourceLine" id="cb6-13" title="13">    }</a>
+<a class="sourceLine" id="cb6-14" title="14"></a>
+<a class="sourceLine" id="cb6-15" title="15">  <span class="co">// ...</span></a></code></pre></div>
+<p>Finally, to read a case class of your own definition, such as for <code>Endpoint</code>:</p>
+<p>you need to define how to read its component parts:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb7-1" title="1"><span class="kw">object</span> Endpoint {</a>
+<a class="sourceLine" id="cb7-2" title="2">  <span class="kw">implicit</span> <span class="kw">def</span> configuredf[F[_]](<span class="kw">implicit</span> F: Applicative[F]): Configured[F, Endpoint] = (</a>
+<a class="sourceLine" id="cb7-3" title="3">    Configured[F, String].<span class="fu">withSuffix</span>(<span class="st">&quot;HOST&quot;</span>),</a>
+<a class="sourceLine" id="cb7-4" title="4">    Configured[F, Int].<span class="fu">withSuffix</span>(<span class="st">&quot;PORT&quot;</span>)</a>
+<a class="sourceLine" id="cb7-5" title="5">  ).<span class="fu">mapN</span>(Endpoint.<span class="fu">apply</span>)</a>
+<a class="sourceLine" id="cb7-6" title="6">}</a></code></pre></div>
+<p>This took care of: - environment variable naming, via <code>.withSuffix()</code>, - accumulation of multiple errors, via the applicative combinator <code>mapN</code>.</p>
 <h2 id="factoring-out-the-conversion">Factoring out the Conversion</h2>
-<p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using ‘Content here, content here’, making it look like readable English.</p>
+<p>Although the implementations are elided in the type class instances above, I found that there was an amount of code duplication between them. My first approach to this was to factor the code out as a function that supported conversion from <code>String</code> to any type <code>A</code>:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb8-1" title="1">  <span class="kw">private</span> <span class="kw">def</span> eval[A](env: Environment, name: String, f: String =&gt; A): ValidatedNec[ConfiguredError, A] =</a>
+<a class="sourceLine" id="cb8-2" title="2">    env.<span class="fu">get</span>(name)</a>
+<a class="sourceLine" id="cb8-3" title="3">      .<span class="fu">map</span> {</a>
+<a class="sourceLine" id="cb8-4" title="4">        s =&gt;</a>
+<a class="sourceLine" id="cb8-5" title="5">          Either.<span class="fu">catchNonFatal</span>(<span class="fu">f</span>(s))</a>
+<a class="sourceLine" id="cb8-6" title="6">            .<span class="fu">fold</span>(</a>
+<a class="sourceLine" id="cb8-7" title="7">              _ =&gt; ConfiguredError.<span class="fu">InvalidValue</span>(name, s).<span class="fu">invalidNec</span>[A],</a>
+<a class="sourceLine" id="cb8-8" title="8">              _.<span class="fu">validNec</span>[ConfiguredError]</a>
+<a class="sourceLine" id="cb8-9" title="9">            )</a>
+<a class="sourceLine" id="cb8-10" title="10">      }.<span class="fu">getOrElse</span>(ConfiguredError.<span class="fu">MissingValue</span>(name).<span class="fu">invalidNec</span>[A])</a></code></pre></div>
+<p>I decided then this this itself should be represented by its own typeclass called <code>Conversion</code>. <code>Configured</code> would then build upon <code>Conversion</code>. So I did.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb9-1" title="1"><span class="kw">trait</span> Conversion[A] {</a>
+<a class="sourceLine" id="cb9-2" title="2">  <span class="kw">def</span> <span class="fu">of</span>(s: String): Either[String, A]</a>
+<a class="sourceLine" id="cb9-3" title="3">}</a></code></pre></div>
+<p>That way, to add support for a new primitive type, the user only had to add a new instance of <code>Conversion</code>. Even better, they could repurpose an existing type for their new type via <code>Functor.map</code>:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb10-1" title="1">  <span class="kw">final</span> <span class="kw">case</span> <span class="kw">class</span> <span class="fu">Latitude</span>(value: Double) <span class="kw">extends</span> AnyVal</a>
+<a class="sourceLine" id="cb10-2" title="2"></a>
+<a class="sourceLine" id="cb10-3" title="3">  <span class="kw">object</span> Latitude {</a>
+<a class="sourceLine" id="cb10-4" title="4">    <span class="kw">implicit</span> <span class="kw">def</span> conversion: Conversion[Latitude] =</a>
+<a class="sourceLine" id="cb10-5" title="5">      Conversion[Double].<span class="fu">map</span>(Latitude.<span class="fu">apply</span>)</a>
+<a class="sourceLine" id="cb10-6" title="6">  }</a></code></pre></div>
 <h2 id="moving-to-reader-monad">Moving to Reader monad</h2>
 <p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using ‘Content here, content here’, making it look like readable English.</p>
 <h1 id="looking-back">Looking back</h1>
