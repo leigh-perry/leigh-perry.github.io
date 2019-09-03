@@ -110,15 +110,21 @@
 <a class="sourceLine" id="cb6-13" title="13">    }</a>
 <a class="sourceLine" id="cb6-14" title="14"></a>
 <a class="sourceLine" id="cb6-15" title="15">  <span class="co">// ...</span></a></code></pre></div>
-<p>Finally, to read a case class of your own definition, such as for <code>Endpoint</code>:</p>
-<p>you need to define how to read its component parts:</p>
+<p>Finally, to read a case class of your own definition, such as for <code>Endpoint</code>, you need to define how to read its component parts:</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb7-1" title="1"><span class="kw">object</span> Endpoint {</a>
-<a class="sourceLine" id="cb7-2" title="2">  <span class="kw">implicit</span> <span class="kw">def</span> configuredf[F[_]](<span class="kw">implicit</span> F: Applicative[F]): Configured[F, Endpoint] = (</a>
-<a class="sourceLine" id="cb7-3" title="3">    Configured[F, String].<span class="fu">withSuffix</span>(<span class="st">&quot;HOST&quot;</span>),</a>
-<a class="sourceLine" id="cb7-4" title="4">    Configured[F, Int].<span class="fu">withSuffix</span>(<span class="st">&quot;PORT&quot;</span>)</a>
-<a class="sourceLine" id="cb7-5" title="5">  ).<span class="fu">mapN</span>(Endpoint.<span class="fu">apply</span>)</a>
-<a class="sourceLine" id="cb7-6" title="6">}</a></code></pre></div>
-<p>This took care of: - environment variable naming, via <code>.withSuffix()</code>, - accumulation of multiple errors, via the applicative combinator <code>mapN</code>.</p>
+<a class="sourceLine" id="cb7-2" title="2">  <span class="kw">implicit</span> <span class="kw">val</span> configuredEndpoint: Configured[Endpoint] =</a>
+<a class="sourceLine" id="cb7-3" title="3">    <span class="kw">new</span> Configured[Endpoint] {</a>
+<a class="sourceLine" id="cb7-4" title="4">      <span class="kw">override</span> <span class="kw">def</span> <span class="fu">value</span>(env: Environment, name: String): ValidatedNec[ConfiguredError, Endpoint] = (</a>
+<a class="sourceLine" id="cb7-5" title="5">        Configured[String].<span class="fu">withSuffix</span>(env, name, <span class="st">&quot;HOST&quot;</span>),</a>
+<a class="sourceLine" id="cb7-6" title="6">        Configured[Int].<span class="fu">withSuffix</span>(env, name, <span class="st">&quot;PORT&quot;</span>)</a>
+<a class="sourceLine" id="cb7-7" title="7">      ).<span class="fu">mapN</span>(Endpoint.<span class="fu">apply</span>)</a>
+<a class="sourceLine" id="cb7-8" title="8">    }</a>
+<a class="sourceLine" id="cb7-9" title="9">}</a></code></pre></div>
+<p>This took care of:</p>
+<ul>
+<li>environment variable naming, via <code>.withSuffix()</code>,</li>
+<li>accumulation of multiple errors, via the applicative combinator <code>mapN</code>.</li>
+</ul>
 <h2 id="factoring-out-the-conversion">Factoring out the Conversion</h2>
 <p>Although the implementations are elided in the type class instances above, I found that there was an amount of code duplication between them. My first approach to this was to factor the code out as a function that supported conversion from <code>String</code> to any type <code>A</code>:</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb8-1" title="1">  <span class="kw">private</span> <span class="kw">def</span> eval[A](env: Environment, name: String, f: String =&gt; A): ValidatedNec[ConfiguredError, A] =</a>
@@ -131,7 +137,8 @@
 <a class="sourceLine" id="cb8-8" title="8">              _.<span class="fu">validNec</span>[ConfiguredError]</a>
 <a class="sourceLine" id="cb8-9" title="9">            )</a>
 <a class="sourceLine" id="cb8-10" title="10">      }.<span class="fu">getOrElse</span>(ConfiguredError.<span class="fu">MissingValue</span>(name).<span class="fu">invalidNec</span>[A])</a></code></pre></div>
-<p>I decided then this this itself should be represented by its own typeclass called <code>Conversion</code>. <code>Configured</code> would then build upon <code>Conversion</code>. So I did.</p>
+<p>I decided then this this itself should be represented by its own typeclass called <code>Conversion</code>. <code>Configured</code> would then build upon <code>Conversion</code>.</p>
+<p>So I did.</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb9-1" title="1"><span class="kw">trait</span> Conversion[A] {</a>
 <a class="sourceLine" id="cb9-2" title="2">  <span class="kw">def</span> <span class="fu">of</span>(s: String): Either[String, A]</a>
 <a class="sourceLine" id="cb9-3" title="3">}</a></code></pre></div>
@@ -143,9 +150,22 @@
 <a class="sourceLine" id="cb10-5" title="5">      Conversion[Double].<span class="fu">map</span>(Latitude.<span class="fu">apply</span>)</a>
 <a class="sourceLine" id="cb10-6" title="6">  }</a></code></pre></div>
 <h2 id="moving-to-reader-monad">Moving to Reader monad</h2>
-<p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using ‘Content here, content here’, making it look like readable English.</p>
+<p>Take a look at the <code>Configured</code> instance for <code>Endpoint</code>, above. The <code>Environment</code> parameter is being passed explicitly around. This represents a functional-programming-opportunity™ that is difficult to resist. I changed over the the Reader monad, which now takes care of making that <code>Environment</code> instance available:</p>
+<pre><code>trait Configured[F[_], A] {
+  def value(name: String): Kleisli[F, Environment, ValidatedNec[ConfiguredError, A]]
+  :
+}</code></pre>
+<p>Actually, this uses the <code>ReaderT</code> monad transformer, since for purity and referential transparency, all operations are going happen in some IO monad. <code>Kleisli</code> is another name for <code>ReaderT</code>.</p>
 <h1 id="looking-back">Looking back</h1>
-<p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using ‘Content here, content here’, making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for ‘lorem ipsum’ will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).</p>
+<p>Overall, the library did what I wanted. Because of the <a href="https://github.com/typelevel/cats-effect">cats-effect abstractions</a>, it can be used unchanged with <a href="https://github.com/typelevel/cats-effect/blob/master/core/shared/src/main/scala/cats/effect/IO.scala">cats.effect.IO</a> and <a href="https://github.com/zio/zio">ZIO</a> IO monads.</p>
+<p>Moving to <code>Kleisli</code> made the implementation more difficult to read. But one very nice implementation fell out of the refactor:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb12-1" title="1">  <span class="kw">implicit</span> <span class="kw">def</span> configuredEither[F[_], A, B](</a>
+<a class="sourceLine" id="cb12-2" title="2">    <span class="kw">implicit</span> F: Monad[F],</a>
+<a class="sourceLine" id="cb12-3" title="3">    A: Configured[F, A],</a>
+<a class="sourceLine" id="cb12-4" title="4">    B: Configured[F, B]</a>
+<a class="sourceLine" id="cb12-5" title="5">  ): Configured[F, Either[A, B]] =</a>
+<a class="sourceLine" id="cb12-6" title="6">    A or B</a></code></pre></div>
+<p>The inductive implementation of <code>Either</code>’s <code>Configured</code> instance came down to a very neat <code>A or B</code>.</p>
 
         </div>
         <div id="footer">
