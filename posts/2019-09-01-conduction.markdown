@@ -115,20 +115,21 @@ object Configured {
   // ...
 ```
 
-Finally, to read a case class of your own definition, such as for `Endpoint`:
-
-
-you need to define how to read its component parts:
+Finally, to read a case class of your own definition, such as for `Endpoint`, you need to define how to read its component parts:
 ```scala
 object Endpoint {
-  implicit def configuredf[F[_]](implicit F: Applicative[F]): Configured[F, Endpoint] = (
-    Configured[F, String].withSuffix("HOST"),
-    Configured[F, Int].withSuffix("PORT")
-  ).mapN(Endpoint.apply)
+  implicit val configuredEndpoint: Configured[Endpoint] =
+    new Configured[Endpoint] {
+      override def value(env: Environment, name: String): ValidatedNec[ConfiguredError, Endpoint] = (
+        Configured[String].withSuffix(env, name, "HOST"),
+        Configured[Int].withSuffix(env, name, "PORT")
+      ).mapN(Endpoint.apply)
+    }
 }
 ```
 
 This took care of:
+
 - environment variable naming, via `.withSuffix()`,
 - accumulation of multiple errors, via the applicative combinator `mapN`.
 
@@ -150,7 +151,8 @@ My first approach to this was to factor the code out as a function that supporte
 ```
 
 I decided then this this itself should be represented by its own typeclass called `Conversion`. 
-`Configured` would then build upon `Conversion`. 
+`Configured` would then build upon `Conversion`.
+
 So I did.
 ```scala
 trait Conversion[A] {
@@ -171,8 +173,35 @@ Even better, they could repurpose an existing type for their new type via `Funct
 
 ## Moving to Reader monad
 
-It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English.
+Take a look at the `Configured` instance for `Endpoint`, above. The `Environment` parameter is being passed explicitly around.
+This represents a functional-programming-opportunity™ that is difficult to resist.
+I changed over the the Reader monad, which now takes care of making that `Environment` instance available:
+```
+trait Configured[F[_], A] {
+  def value(name: String): Kleisli[F, Environment, ValidatedNec[ConfiguredError, A]]
+  :
+}
+```
+
+Actually, this uses the `ReaderT` monad transformer, since for purity and referential transparency, all operations are going happen in some IO monad.
+`Kleisli` is another name for `ReaderT`.
 
 # Looking back
 
-It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).
+Overall, the library did what I wanted. Because of the [cats-effect abstractions](https://github.com/typelevel/cats-effect), it can
+be used unchanged with [cats.effect.IO](https://github.com/typelevel/cats-effect/blob/master/core/shared/src/main/scala/cats/effect/IO.scala)
+and [ZIO](https://github.com/zio/zio) IO monads.
+
+Moving to `Kleisli` made the implementation more difficult to read.
+But one very nice implementation fell out of the refactor:
+```scala
+  implicit def configuredEither[F[_], A, B](
+    implicit F: Monad[F],
+    A: Configured[F, A],
+    B: Configured[F, B]
+  ): Configured[F, Either[A, B]] =
+    A or B
+```
+
+The inductive implementation of `Either`'s `Configured` instance came down to a very neat `A or B`.
+
