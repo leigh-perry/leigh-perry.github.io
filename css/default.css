@@ -1,20 +1,21 @@
 body {
   color: black;
   margin: 0px auto 0px auto;
-  width: 600px;
+  width: 750px;
   font-family: Calibri, Verdana, Arial, sans-serif;
   font-size: 10.5pt;
   line-height: 200%;
-  color: #606460;
+  color: #606460
 }
 
 code {
-  font-family: Andale Mono, monospace;
-  line-height: 100%;
+  font-family: Andale Mono, monospace
 }
 
 div.sourceCode {
   background-color: #f6f6f6;
+  line-height: 140%;
+  width: 900px
 }
 
 div#header {
@@ -54,11 +55,11 @@ div#footer {
 }
 
 h1 {
-  font-size: 15pt;
+  font-size: 15pt
 }
 
 h2 {
-  font-size: 14pt;
+  font-size: 14pt
 }
 
 div.info {
