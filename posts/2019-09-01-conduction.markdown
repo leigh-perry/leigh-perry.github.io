@@ -1,5 +1,5 @@
 ---
-title: Design of a Configuration Library
+title: Design of a configuration library
 ---
 
 As a rule of thumb, there is a configuration library for every five developers (and a logging library for every two). 
@@ -203,5 +203,4 @@ But one very nice implementation fell out of the refactor:
     A or B
 ```
 
-The inductive implementation of `Either`'s `Configured` instance came down to a very neat `A or B`.
-
+The inductive implementation of `Either`'s `Configured` instance came down to a cute `A or B`.
