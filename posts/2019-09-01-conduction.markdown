@@ -58,7 +58,7 @@ You can read more over at the Conduction [documentation page](https://github.com
 In writing the library, I had some ambitions.
 
 - I wanted it to be pure-functional.
-- Extensibility. Allow the user to
+- It should be extensibility – allow the user to:
   - add new primitive types,
   - add new complex types,
   - add other _effects_ beyond `Option`, `List`, `Either`, etc.
@@ -79,6 +79,7 @@ trait Configured[A] {
 ```
 
 This trait covers most of the aims of the library.
+
 - It provides the basic mechanism of reading a value of type `A`.
 - It defines a family of configuration errors in the ADT `ConfiguredError`.
 - It accumulates multiple errors via the `ValidatedNec[ConfiguredError, A]` return value.
