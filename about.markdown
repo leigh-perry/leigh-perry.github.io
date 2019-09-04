@@ -4,8 +4,8 @@ title: About
 
 ![](/images/LP-2019.jpg)
 
-I am a software engineer in Sydney, Australia.
-I am currently very interested in functional programming.
+I am a software engineer in Sydney.
+I am very interested in functional programming (FP).
 In my day job, I use FP in Scala.
 
 Outside of work hours, I like to play with Haskell as well as Scala.
