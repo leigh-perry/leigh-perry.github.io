@@ -2,8 +2,7 @@
 title: About
 ---
 
-This is Leigh Perry's Blog.
-That's me – I am Leigh.
+![](/images/LP-2019.jpg)
 
 I am a software engineer in Sydney, Australia.
 I am currently very interested in functional programming.
