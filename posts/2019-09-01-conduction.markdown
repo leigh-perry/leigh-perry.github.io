@@ -3,7 +3,7 @@ title: Design of a configuration library
 ---
 
 As a rule of thumb, there is a configuration library for every five developers (and a logging library for every two). 
-This blog is about my configuration library, called [Conduction](https://github.com/leigh-perry/conduction). 
+This article is about my configuration library, called [Conduction](https://github.com/leigh-perry/conduction). 
 
 # Justification
 
