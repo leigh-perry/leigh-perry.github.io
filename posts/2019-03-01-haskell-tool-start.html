@@ -34,7 +34,7 @@
 <h1 id="install-stack">Install stack</h1>
 <p>IntelliJ requires use of the Stack build tool. Install it by following [these instructions(https://docs.haskellstack.org/en/stable/install_and_upgrade/).</p>
 <h1 id="enable-intellij">Enable IntelliJ</h1>
-<p>In IntelliJ, install the <a href="https://plugins.jetbrains.com/plugin/8258-intellij-haskell/">IntelliJ-Haskell plugin</a>. In <code>File / Project Structure / SDKs</code> (<code>⌘-;</code>), add an entry for Stack. You can find the location of stack via <code>which stack</code>, on OS X typically at <code>/usr/local/bin/stack</code>.</p>
+<p>In IntelliJ, install the <a href="https://plugins.jetbrains.com/plugin/8258-intellij-haskell/">IntelliJ-Haskell plugin</a>. In <code>File / Project Structure / SDKs</code> (<code>⌘-;</code>), add an entry for Stack. <img src="../images/haskell-sdks.png" alt="stack sdk" /> You can find the location of stack via <code>which stack</code>, on OS X typically at <code>/usr/local/bin/stack</code>.</p>
 <h1 id="create-a-project">Create a project</h1>
 <p>In the parent directory where you want to create a Haskell project, run <code>stack new someproject</code>. The output should look like:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1"><span class="ex">Downloading</span> template <span class="st">&quot;new-template&quot;</span> to create project <span class="st">&quot;someproject&quot;</span> in someproject/ ...</a>
@@ -60,7 +60,8 @@
 <h2 id="stack-project-templates">Stack project templates</h2>
 <p>TODO</p>
 <h1 id="open-project-in-intellij">Open project in IntelliJ</h1>
-<p>To open the project, select <code>File / New / Project from existing sources</code>. Navigate to and select the <code>someproject</code> directory created above. IntelliJ should open the project. This might take a while, even a long while, to download dependencies and look busy generally.</p>
+<p>To open the project, select <code>File / New / Project from existing sources</code>. Choose Haskell Stack. <img src="../images/haskell-existing-project.png" alt="existing project" /> Navigate to and select the <code>someproject</code> directory created above.</p>
+<p>IntelliJ should open the project. This might take a while, even a long while, to download dependencies and look busy generally.</p>
 <h2 id="ide-capabilities">IDE capabilities</h2>
 <p>IntelliJ can provide some basic IDE capabilities, but if you are used to its capabilities in Java, Kotlin or Scala, you might find the range of capabilities surprisingly minor. Some things it <em>can</em> do:</p>
 <ul>
