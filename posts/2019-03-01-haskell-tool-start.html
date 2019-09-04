@@ -35,9 +35,7 @@
 <p>IntelliJ requires use of the Stack build tool. Install it by following [these instructions(https://docs.haskellstack.org/en/stable/install_and_upgrade/).</p>
 <h1 id="enable-intellij">Enable IntelliJ</h1>
 <p>In IntelliJ, install the <a href="https://plugins.jetbrains.com/plugin/8258-intellij-haskell/">IntelliJ-Haskell plugin</a>. In <code>File / Project Structure / SDKs</code> (<code>⌘-;</code>), add an entry for Stack.</p>
-<figure>
-<img src="../images/haskell-sdks.png" alt="stack sdk" /><figcaption>stack sdk</figcaption>
-</figure>
+<p><img src="../images/haskell-sdks.png" /></p>
 <p>You can find the location of stack via <code>which stack</code>, on OS X typically at <code>/usr/local/bin/stack</code>.</p>
 <h1 id="create-a-project">Create a project</h1>
 <p>In the parent directory where you want to create a Haskell project, run <code>stack new someproject</code>. The output should look like:</p>
@@ -65,9 +63,7 @@
 <p>TODO</p>
 <h1 id="open-project-in-intellij">Open project in IntelliJ</h1>
 <p>To open the project, select <code>File / New / Project from existing sources</code>. Choose Haskell Stack.</p>
-<figure>
-<img src="../images/haskell-existing-project.png" alt="existing project" /><figcaption>existing project</figcaption>
-</figure>
+<p><img src="../images/haskell-existing-project.png" /></p>
 <p>Navigate to and select the <code>someproject</code> directory created above.</p>
 <p>IntelliJ should open the project. This might take a while, even a long while, to download dependencies and look busy generally.</p>
 <h2 id="ide-capabilities">IDE capabilities</h2>
