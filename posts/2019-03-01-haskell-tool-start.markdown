@@ -15,7 +15,7 @@ Install it by following [these instructions(https://docs.haskellstack.org/en/sta
 In IntelliJ, install the [IntelliJ-Haskell plugin](https://plugins.jetbrains.com/plugin/8258-intellij-haskell/).
 In `File / Project Structure / SDKs` (`⌘-;`), add an entry for Stack.
  
-![stack sdk](/images/haskell-sdks.png)
+![](/images/haskell-sdks.png)
 
 You can find the location of stack via `which stack`, on OS X typically at `/usr/local/bin/stack`.
 
@@ -58,7 +58,7 @@ TODO
 To open the project, select `File / New / Project from existing sources`.
 Choose Haskell Stack.
 
-![existing project](/images/haskell-existing-project.png)
+![](/images/haskell-existing-project.png)
 
 Navigate to and select the `someproject` directory created above.
 
