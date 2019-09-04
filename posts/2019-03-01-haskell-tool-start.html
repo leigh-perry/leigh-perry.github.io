@@ -30,19 +30,51 @@
     
 </div>
 
-<h2 id="environment-options">Environment options</h2>
-<p>Although configuration values are typically read from environment variables, they can be read from any source that provides an instance of <code>Environment</code>:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb1-1" title="1"><span class="kw">trait</span> Environment {</a>
-<a class="sourceLine" id="cb1-2" title="2">  <span class="kw">def</span> <span class="fu">get</span>(key: String): Option[String]</a>
-<a class="sourceLine" id="cb1-3" title="3">}</a></code></pre></div>
-<p><code>Environment.fromEnvVars</code> provides normal access to environment variables. <code>Environment.fromMap(map: Map[String, String])</code> uses a prepopulated map of values, which is useful for unit testing.</p>
-<h2 id="error-reporting">Error reporting</h2>
-<p>The library is invoked with the <code>Environment</code> instance injected via Reader Monad, and returns a <code>ValidatedNec[ConfiguredError, A]</code>. Composition of <code>Configured</code> instances is done using applicative combination, eg</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb2-1" title="1">  <span class="kw">implicit</span> <span class="kw">def</span> configuredf[F[_]](<span class="kw">implicit</span> F: Applicative[F]): Configured[F, Endpoint] = (</a>
-<a class="sourceLine" id="cb2-2" title="2">    Configured[F, String].<span class="fu">withSuffix</span>(<span class="st">&quot;HOST&quot;</span>),</a>
-<a class="sourceLine" id="cb2-3" title="3">    Configured[F, Int].<span class="fu">withSuffix</span>(<span class="st">&quot;PORT&quot;</span>)</a>
-<a class="sourceLine" id="cb2-4" title="4">  ).<span class="fu">mapN</span>(Endpoint.<span class="fu">apply</span>)</a></code></pre></div>
-<p>This means that if configuration errors are present, all errors are reported, rather than bailing at the first error discovered.</p>
+<p>This article helps the Haskell neophyte get started with an IDE for Haskell. It assumes that you have a predeliction for IntelliJ.</p>
+<h1 id="install-stack">Install stack</h1>
+<p>IntelliJ requires use of the Stack build tool. Install it by following [these instructions(https://docs.haskellstack.org/en/stable/install_and_upgrade/).</p>
+<h1 id="enable-intellij">Enable IntelliJ</h1>
+<p>In IntelliJ, install the <a href="https://plugins.jetbrains.com/plugin/8258-intellij-haskell/">IntelliJ-Haskell plugin</a>. In <code>File / Project Structure / SDKs</code> (<code>⌘-;</code>), add an entry for Stack. You can find the location of stack via <code>which stack</code>, on OS X typically at <code>/usr/local/bin/stack</code>.</p>
+<h1 id="create-a-project">Create a project</h1>
+<p>In the parent directory where you want to create a Haskell project, run <code>stack new someproject</code>. The output should look like:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1"><span class="ex">Downloading</span> template <span class="st">&quot;new-template&quot;</span> to create project <span class="st">&quot;someproject&quot;</span> in someproject/ ...</a>
+<a class="sourceLine" id="cb1-2" title="2"></a>
+<a class="sourceLine" id="cb1-3" title="3"> <span class="bu">:</span></a>
+<a class="sourceLine" id="cb1-4" title="4"></a>
+<a class="sourceLine" id="cb1-5" title="5"><span class="ex">Looking</span> for .cabal or package.yaml files to use to init the project.</a>
+<a class="sourceLine" id="cb1-6" title="6"><span class="ex">Using</span> cabal packages:</a>
+<a class="sourceLine" id="cb1-7" title="7"><span class="ex">-</span> someproject/</a>
+<a class="sourceLine" id="cb1-8" title="8"></a>
+<a class="sourceLine" id="cb1-9" title="9"><span class="ex">Selecting</span> the best among 16 snapshots...</a>
+<a class="sourceLine" id="cb1-10" title="10"></a>
+<a class="sourceLine" id="cb1-11" title="11"><span class="ex">*</span> Matches lts-14.4</a>
+<a class="sourceLine" id="cb1-12" title="12"></a>
+<a class="sourceLine" id="cb1-13" title="13"><span class="ex">Selected</span> resolver: lts-14.4</a>
+<a class="sourceLine" id="cb1-14" title="14"><span class="ex">Initialising</span> configuration using resolver: lts-14.4</a>
+<a class="sourceLine" id="cb1-15" title="15"><span class="ex">Total</span> number of user packages considered: 1</a>
+<a class="sourceLine" id="cb1-16" title="16"><span class="ex">Writing</span> configuration to file: someproject/stack.yaml</a>
+<a class="sourceLine" id="cb1-17" title="17"><span class="ex">All</span> done.</a></code></pre></div>
+<p>To build the project:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1"><span class="bu">cd</span> someproject</a>
+<a class="sourceLine" id="cb2-2" title="2"><span class="ex">stack</span> build</a></code></pre></div>
+<h2 id="stack-project-templates">Stack project templates</h2>
+<p>TODO</p>
+<h1 id="open-project-in-intellij">Open project in IntelliJ</h1>
+<p>To open the project, select <code>File / New / Project from existing sources</code>. Navigate to and select the <code>someproject</code> directory created above. IntelliJ should open the project. This might take a while, even a long while, to download dependencies and look busy generally.</p>
+<h2 id="ide-capabilities">IDE capabilities</h2>
+<p>IntelliJ can provide some basic IDE capabilities, but if you are used to its capabilities in Java, Kotlin or Scala, you might find the range of capabilities surprisingly minor. Some things it <em>can</em> do:</p>
+<ul>
+<li>reformat code (<code>⌘-L</code>) – this is equivalent to running the <code>hindent</code> tool</li>
+<li>organise imports (<code>⌘-O</code>)</li>
+<li>auto-import (via <code>⌥-Enter</code> popup menu)</li>
+<li>apply suggestion (via <code>⌥-Enter</code> popup menu) – suggestions are equivalent to those generated by the <code>hlint</code> tool</li>
+</ul>
+<h1 id="development-workflow">Development workflow</h1>
+<p>TODO</p>
+<h2 id="ghcid">ghcid</h2>
+<p>TODO</p>
+<h2 id="running-tests">Running tests</h2>
+<p>TODO</p>
 
         </div>
         <div id="footer">

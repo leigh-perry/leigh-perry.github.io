@@ -30,7 +30,7 @@
     
 </div>
 
-<p>As a rule of thumb, there is a configuration library for every five developers (and a logging library for every two). This blog is about my configuration library, called <a href="https://github.com/leigh-perry/conduction">Conduction</a>.</p>
+<p>As a rule of thumb, there is a configuration library for every five developers (and a logging library for every two). This article is about my configuration library, called <a href="https://github.com/leigh-perry/conduction">Conduction</a>.</p>
 <h1 id="justification">Justification</h1>
 <p>Why write another configuration library? Well, in the age of containerised cloud deployments, programs usually need to read their configuration from environment variables. But they need to read that configuration into rich data structures, such as:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb1-1" title="1">  <span class="kw">final</span> <span class="kw">case</span> <span class="kw">class</span> <span class="fu">AppConfig</span>(</a>
