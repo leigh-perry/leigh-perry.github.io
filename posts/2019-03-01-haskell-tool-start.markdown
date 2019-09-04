@@ -8,7 +8,7 @@ It assumes that you have a predeliction for IntelliJ.
 # Install stack
 
 IntelliJ requires use of the Stack build tool.
-Install it by following [these instructions(https://docs.haskellstack.org/en/stable/install_and_upgrade/).
+Install it by following [these instructions](https://docs.haskellstack.org/en/stable/install_and_upgrade/).
 
 # Enable IntelliJ
 
