@@ -55,7 +55,7 @@ This still stack overflows, but we can change it again slightly to reflect that 
     f => f(rec(f))
 ``` 
 Looking at this as a curried function, it has two argument.
-First the function `((A => A) => (A => A))``` that is to be fixed.
+First the function `((A => A) => (A => A))` that is to be fixed.
 The second argument is an `A`.
 This leaves just the return value of type `A`.
 
