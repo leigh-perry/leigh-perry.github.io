@@ -3,8 +3,12 @@ title: Deriving Haskell's fix function
 ---
 
 The function `fix` is the essence of recursion.
-It originates from lambda calculus and the [Y-combinator](https://en.wikipedia.org/wiki/Fixed-point_combinator) 
-`λf.(λx.f(xx))(λx.f(xx))`, which reduces nicely to a function:
+It originates from lambda calculus and the Y-combinator.
+```  
+λf.(λx.f(xx))(λx.f(xx))
+```
+
+The Y-combinator [reduces nicely](https://en.wikipedia.org/wiki/Fixed-point_combinator) to a function:
 ```
 Y    = λf.(λx.f(xx))(λx.f(xx))
 Y g  = (λf. (λx.f(xx)) (λx.f(xx))) g
