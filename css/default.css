@@ -11,9 +11,6 @@ body {
 code {
   font-family: Andale Mono, monospace;
   font-size: 9.5pt;
-}
-
-div.sourceCode {
   background-color: #f6f6f6;
   line-height: 133%;
   width: 900px
