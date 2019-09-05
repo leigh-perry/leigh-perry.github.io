@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>Sesquipedalia - Converting Haskell's fix function to Scala</title>
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="alternate" type="application/rss+xml" title="Sesquipedalia" href="../feed.xml">
+        <link rel="alternate" type="application/atom+xml" title="Sesquipedalia" href="../atom.xml">
+        <link rel="shortcut icon" href="../site/favicon.ico">
+    </head>
+    <body>
+        <div id="header">
+            <div id="logo">
+                <a href="../">Sesquipedalia</a>
+            </div>
+            <div id="navigation">
+                <a href="../index.html">Home</a>
+                <a href="../about.html">About</a>
+                <a href="../contact.html">Contact</a>
+                <a href="../archive.html">Archive</a>
+            </div>
+        </div>
+
+        <div id="content">
+            <h1>Converting Haskell's fix function to Scala</h1>
+
+            <div class="info">
+    Posted on April  1, 2019
+    
+</div>
+
+<p>The function <code>fix</code> is the essence of recursion. It originates from lambda calculus and the <a href="https://en.wikipedia.org/wiki/Fixed-point_combinator">Y-combinator</a> <code>λf.(λx.f(xx))(λx.f(xx))</code>, which reduces nicely to a function:</p>
+<pre><code>Y    = λf.(λx.f(xx))(λx.f(xx))
+Y g  = (λf. (λx.f(xx)) (λx.f(xx))) g
+     = (λx.g(xx)) (λx.g(xx))
+     = g((λx.g(xx)) (λx.g(xx)))
+     = g (Y g)</code></pre>
+<p>In Haskell, this is <code>fix g = g (fix g)</code>.</p>
+<pre><code>Prelude&gt; fix g = g (fix g)
+Prelude&gt; :t fix
+fix :: (t -&gt; t) -&gt; t</code></pre>
+<p>GHC’s amazing type inference engine is able to determine that this is of type <code>(t -&gt; t) -&gt; t</code>, that is it can tell that <code>g</code> is a function.</p>
+<p>Anyway, putting this to use in a recursive function. Factorial is the canonical recursive function. Written with explicit recursion, <code>fac</code> is:</p>
+<pre><code>Prelude&gt; fac n = if (n &lt; 3) then n else n * fac (n - 1)
+
+Prelude&gt; fac 6
+720
+
+Prelude&gt; :t fac
+fac :: (Ord t, Num t) =&gt; t -&gt; t</code></pre>
+<p>To remove the explicit recursion, just replace the call to <code>fac</code> with a call to some function <code>f</code> that now becomes an argument of the <code>fac</code> function.</p>
+<pre><code>Prelude&gt; fac f n = if (n &lt; 3) then n else n * f (n - 1)
+
+Prelude&gt; :t fac
+fac :: (Ord t, Num t) =&gt; (t -&gt; t) -&gt; t -&gt; t</code></pre>
+<p>But when you try and use it:</p>
+<pre><code>Prelude&gt; fac fac 6
+
+&lt;interactive&gt;:6:1: error:
+    • Non type-variable argument in the constraint: Ord (t -&gt; t)
+      (Use FlexibleContexts to permit this)
+    • When checking the inferred type
+        it :: forall t.
+              (Ord t, Ord (t -&gt; t), Num t, Num (t -&gt; t)) =&gt;
+              t -&gt; t</code></pre>
+<p>The solution is to use the <code>fix</code> function we saw above:</p>
+<pre><code>Prelude&gt; fixfac = fix fac
+Prelude&gt; :t fixfac
+fixfac :: (Ord t, Num t) =&gt; t -&gt; t
+
+Prelude&gt; :t fixfac 5
+fixfac 5 :: (Ord t, Num t) =&gt; t
+
+Prelude&gt; fixfac 6
+720</code></pre>
+
+        </div>
+        <div id="footer">
+            Site created with <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+    </body>
+</html>

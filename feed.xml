@@ -25,11 +25,19 @@
     <dc:creator>Leigh Perry</dc:creator>
 </item>
 <item>
-    <title>Converting Haskell's simple fix function to Scala</title>
+    <title>Converting Haskell's fix function to Scala</title>
     <link>https://leigh-perry.github.io/posts/2019-04-03-fix-haskell-to-scala.html</link>
     <description><![CDATA[Another post from Leigh]]></description>
     <pubDate>Wed, 03 Apr 2019 00:00:00 UT</pubDate>
     <guid>https://leigh-perry.github.io/posts/2019-04-03-fix-haskell-to-scala.html</guid>
+    <dc:creator>Leigh Perry</dc:creator>
+</item>
+<item>
+    <title>Converting Haskell's fix function to Scala</title>
+    <link>https://leigh-perry.github.io/posts/2019-04-01-fix-haskell-function.html</link>
+    <description><![CDATA[Another post from Leigh]]></description>
+    <pubDate>Mon, 01 Apr 2019 00:00:00 UT</pubDate>
+    <guid>https://leigh-perry.github.io/posts/2019-04-01-fix-haskell-function.html</guid>
     <dc:creator>Leigh Perry</dc:creator>
 </item>
 <item>
