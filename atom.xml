@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-    <title>Sesquipedalia - Leigh Perry's Blog</title>
+    <title>Ephemera - Leigh Perry's Blog</title>
     <link href="https://leigh-perry.github.io/atom.xml" rel="self" />
     <link href="https://leigh-perry.github.io" />
     <id>https://leigh-perry.github.io/atom.xml</id>
@@ -15,22 +15,6 @@
     <id>https://leigh-perry.github.io/posts/2019-09-01-conduction.html</id>
     <published>2019-09-01T00:00:00Z</published>
     <updated>2019-09-01T00:00:00Z</updated>
-    <summary type="html"><![CDATA[Another post from Leigh]]></summary>
-</entry>
-<entry>
-    <title>Applicative composition of monoids</title>
-    <link href="https://leigh-perry.github.io/posts/2019-06-18-applicative-monoid-composition.html" />
-    <id>https://leigh-perry.github.io/posts/2019-06-18-applicative-monoid-composition.html</id>
-    <published>2019-06-18T00:00:00Z</published>
-    <updated>2019-06-18T00:00:00Z</updated>
-    <summary type="html"><![CDATA[Another post from Leigh]]></summary>
-</entry>
-<entry>
-    <title>Monoids for multiple aggregations in a single pass</title>
-    <link href="https://leigh-perry.github.io/posts/2019-06-08-multimonoids.html" />
-    <id>https://leigh-perry.github.io/posts/2019-06-08-multimonoids.html</id>
-    <published>2019-06-08T00:00:00Z</published>
-    <updated>2019-06-08T00:00:00Z</updated>
     <summary type="html"><![CDATA[Another post from Leigh]]></summary>
 </entry>
 <entry>
