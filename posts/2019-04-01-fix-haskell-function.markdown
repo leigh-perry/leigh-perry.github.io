@@ -1,5 +1,5 @@
 ---
-title: Converting Haskell's fix function to Scala
+title: Deriving Haskell's fix function
 ---
 
 The function `fix` is the essence of recursion.
