@@ -55,7 +55,7 @@
 <p>This still stack overflows, but we can change it again slightly to reflect that brackets around the rightmost <code>A =&gt; A</code> were redundant:</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb7-1" title="1">  <span class="kw">def</span> rec[A, B]: ((A =&gt; A) =&gt; (A =&gt; A)) =&gt; A =&gt; A =</a>
 <a class="sourceLine" id="cb7-2" title="2">    f =&gt; <span class="fu">f</span>(<span class="fu">rec</span>(f))</a></code></pre></div>
-<p>Looking at this as a curried function, it has two argument. First the function <code>((A =&gt; A) =&gt; (A =&gt; A))``` that is to be fixed. The second argument is an</code>A<code>. This leaves just the return value of type</code>A`.</p>
+<p>Looking at this as a curried function, it has two argument. First the function <code>((A =&gt; A) =&gt; (A =&gt; A))</code> that is to be fixed. The second argument is an <code>A</code>. This leaves just the return value of type <code>A</code>.</p>
 <p>Armed with this, we can reimplement as a two argument curried function:</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb8-1" title="1">  <span class="kw">def</span> rec[A, B]: ((A =&gt; A) =&gt; (A =&gt; A)) =&gt; A =&gt; A =</a>
 <a class="sourceLine" id="cb8-2" title="2">    f =&gt; a =&gt; <span class="fu">f</span>(<span class="fu">rec</span>(f))(a)</a></code></pre></div>
