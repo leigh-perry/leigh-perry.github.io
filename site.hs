@@ -17,7 +17,7 @@ main =
     match "css/*" $ do
       route idRoute
       compile compressCssCompiler
-    match (fromList ["about.rst", "contact.markdown"]) $ do
+    match (fromList ["about.markdown", "contact.markdown"]) $ do
       route $ setExtension "html"
       compile $ pandocCompiler >>= loadAndApplyTemplate "templates/default.html" defaultContext >>= relativizeUrls
     match "posts/*" $ do
@@ -54,7 +54,7 @@ postCtx = dateField "date" "%B %e, %Y" `mappend` defaultContext
 myFeedConfiguration :: FeedConfiguration
 myFeedConfiguration =
   FeedConfiguration
-    { feedTitle = "Ephemera - Leigh Perry's Blog"
+    { feedTitle = "Sesquipedalia - Leigh Perry's Blog"
     , feedDescription = "Ephema is a software engineering blog by Leigh Perry"
     , feedAuthorName = "Leigh Perry"
     , feedAuthorEmail = "lperry.breakpoint@gmail.com"
