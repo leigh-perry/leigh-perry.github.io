@@ -30,7 +30,9 @@ Probably never.
 So what is it about?
 
 
-# `ff: F[A => B]` what?
+# What?
+
+`ff: F[A => B]`?
 
 It turns out that you end up with a function in `F` when you use `Functor.map` with a function that takes more than one argument.
 (For this to happen, the function must be in curried form `A => B => C` rather than the more Scala-idiomatic `(A, B) => C` uncurried form).
