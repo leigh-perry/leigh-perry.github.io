@@ -34,7 +34,7 @@
     <summary type="html"><![CDATA[Another post from Leigh]]></summary>
 </entry>
 <entry>
-    <title>Converting Haskell's fix function to Scala</title>
+    <title>Deriving Haskell's fix function</title>
     <link href="https://leigh-perry.github.io/posts/2019-04-01-fix-haskell-function.html" />
     <id>https://leigh-perry.github.io/posts/2019-04-01-fix-haskell-function.html</id>
     <published>2019-04-01T00:00:00Z</published>
