@@ -43,7 +43,28 @@
 <a class="sourceLine" id="cb1-10" title="10"><span class="kw">trait</span> Monad[F[_]] <span class="kw">extends</span> Applicative[F] {</a>
 <a class="sourceLine" id="cb1-11" title="11">  <span class="kw">def</span> flatMap[A, B](fa: F[A])(f: A =&gt; F[B]): F[B]</a>
 <a class="sourceLine" id="cb1-12" title="12">}</a></code></pre></div>
+<p>See <a href="http://adit.io/posts/2013-04-17-functors,_applicatives,_and_monads_in_pictures.html">this explanation</a> for some illuminating visualisations.</p>
 <p><code>Functor</code> and <code>Monad</code> make intuitive sense once you get used to what they do. But <code>Applicative</code> was a different matter. It has that weird <code>ap</code> method, that takes as a parameter <code>ff</code> which is a function from <code>A</code> to <code>B</code> in the effect <code>F</code>. I don’t know about you, but I don’t often end up with a function in an effect. Probably never. So what is it about?</p>
+<h1 id="ff-fa-b-what"><code>ff: F[A =&gt; B]</code> what?</h1>
+<p>It turns out that you end up with a function in <code>F</code> when you use <code>Functor.map</code> with a function that takes more than one argument. (For this to happen, the function must be in curried form <code>A =&gt; B =&gt; C</code> rather than the more Scala-idiomatic <code>(A, B) =&gt; C</code> uncurried form).</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb2-1" title="1">  <span class="kw">val</span> f: A =&gt; B =&gt; C = ...</a>
+<a class="sourceLine" id="cb2-2" title="2">  <span class="kw">val</span> o: Option[A] = a.<span class="fu">some</span></a>
+<a class="sourceLine" id="cb2-3" title="3">  <span class="kw">val</span> o2: Option[B =&gt; C] = o.<span class="fu">map</span>(f)</a></code></pre></div>
+<p>There it is. <code>o2</code> is a function in an effect (<code>Option</code>).</p>
+<h1 id="when">When?</h1>
+<p>When do you use this? <code>Applicative</code>’s reason for existence is the combination of independent effect instances. In Haskell, this is commonly expressed as the idiomatic <code>Applicative</code> chain</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb3-1" title="1">  effectD <span class="fu">=</span> f <span class="fu">&lt;$&gt;</span> effectA <span class="fu">&lt;*&gt;</span> effectB <span class="fu">&lt;*&gt;</span> effectC</a></code></pre></div>
+<p>In this, <code>f</code> has type <code>a -&gt; b -&gt; c -&gt; d</code>, while <code>effectA</code> is <code>F a</code>, <code>effectB</code> is <code>F b</code>, and <code>effectC</code> is <code>F c</code>.</p>
+<p>In Scala, this is more or less:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb4-1" title="1">  <span class="kw">val</span> fa: F[A] = ...</a>
+<a class="sourceLine" id="cb4-2" title="2">  <span class="kw">val</span> fb: F[B] = ...</a>
+<a class="sourceLine" id="cb4-3" title="3">  <span class="kw">val</span> fc: F[C] = ...</a>
+<a class="sourceLine" id="cb4-4" title="4">  <span class="kw">val</span> f: (A, B, C) =&gt; D = ...</a>
+<a class="sourceLine" id="cb4-5" title="5">  <span class="kw">val</span> fc: A =&gt; B =&gt; C =&gt; D = f.<span class="fu">curried</span></a>
+<a class="sourceLine" id="cb4-6" title="6">  <span class="kw">val</span> effectD: F[D] = <span class="fu">ap</span>(effectC)(<span class="fu">ap</span>(effectB)(<span class="fu">map</span>(effectA)(fc)))</a></code></pre></div>
+<p>The significant part here is <code>map(effectA)(f.curried)</code>. This maps the curried function (<code>A =&gt; B =&gt; C =&gt; D</code>) over effectA. That is, it applies <code>fc(a)</code>. But this just partially applies the <code>A</code> to <code>fc</code>, yielding <code>B =&gt; C =&gt; D</code> in the returned effect, ie <code>F[B =&gt; C =&gt; D]</code>. This is then fed into <code>ap</code> on <code>effectB</code>, which partially applies the <code>B</code> parameter. And so on until the function is fully applied, yielding a <code>D</code> in the returned effect, ie <code>F[D]</code>.</p>
+<h1 id="executive-summary">Executive Summary</h1>
+<p>You get a function in an effect via partial application.</p>
 
         </div>
         <div id="footer">
