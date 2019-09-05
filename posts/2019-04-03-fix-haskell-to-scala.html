@@ -30,7 +30,20 @@
     
 </div>
 
-<p>[This article] introduces the <code>fix</code> function – the essence of recursion.</p>
+<p><a href="../posts/2019-04-01-fix-haskell-function.html">This article</a> introduces the <code>fix</code> function – the essence of recursion. It was neatly expressed in Haskell. In fact, the implementation is almost identical to the lambda calculus version, probably because Haskell’s syntax was itself based on lambda calculus.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb1-1" title="1"><span class="ot">fix ::</span> (t <span class="ot">-&gt;</span> t) <span class="ot">-&gt;</span> t</a>
+<a class="sourceLine" id="cb1-2" title="2">fix g <span class="fu">=</span> g (fix g)</a></code></pre></div>
+<p>How to implement this in Scala? A naive port yields this:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb2-1" title="1">  <span class="kw">def</span> fix[T]: (T =&gt; T) =&gt; T =</a>
+<a class="sourceLine" id="cb2-2" title="2">    f =&gt; <span class="fu">f</span>(<span class="fu">fix</span>(f))</a></code></pre></div>
+<p>Now implementing fix-ed factorial:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb3-1" title="1">  <span class="kw">def</span> factorial: (Int =&gt; Int) =&gt; Int =&gt; Int =</a>
+<a class="sourceLine" id="cb3-2" title="2">    f =&gt; n =&gt; <span class="kw">if</span> (n == <span class="dv">1</span>) <span class="dv">1</span> <span class="kw">else</span> n * <span class="fu">f</span>(n - <span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb3-3" title="3"></a>
+<a class="sourceLine" id="cb3-4" title="4">  <span class="kw">val</span> fixfac: Int =&gt; Int = <span class="fu">fix</span>(factorial)</a>
+<a class="sourceLine" id="cb3-5" title="5">  <span class="fu">println</span>(<span class="fu">fixfac</span>(<span class="dv">6</span>))</a></code></pre></div>
+<p>This compiles fine but there is one small problem – stack overflow.</p>
+<p>The problem is that Scala performs eager evaluation, so <code>f(fix(f))</code> evaluates immediately and infinitely. In Haskell, lazy evaluation prevents this issue. It goes to show how lazy evaluation lets you write programs in an idealised way, not worrying about behaviour or termination.</p>
 
         </div>
         <div id="footer">
