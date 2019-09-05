@@ -66,6 +66,6 @@ Armed with this, we can reimplement as a two argument curried function:
 ``` 
 
 And this doesn't stack overflow. The code `f(fix(f))` still executes eagerly but it only
-partially applies the two argument function. It acts as a lazy evaluation thunk, somewhere like in Haskell. 
+partially applies the two argument function. It acts as a lazy evaluation thunk, somewhat like in Haskell. 
 
 And we are done.
