@@ -30,7 +30,9 @@
     
 </div>
 
-<p>The function <code>fix</code> is the essence of recursion. It originates from lambda calculus and the <a href="https://en.wikipedia.org/wiki/Fixed-point_combinator">Y-combinator</a> <code>λf.(λx.f(xx))(λx.f(xx))</code>, which reduces nicely to a function:</p>
+<p>The function <code>fix</code> is the essence of recursion. It originates from lambda calculus and the Y-combinator.</p>
+<pre><code>λf.(λx.f(xx))(λx.f(xx))</code></pre>
+<p>The Y-combinator <a href="https://en.wikipedia.org/wiki/Fixed-point_combinator">reduces nicely</a> to a function:</p>
 <pre><code>Y    = λf.(λx.f(xx))(λx.f(xx))
 Y g  = (λf. (λx.f(xx)) (λx.f(xx))) g
      = (λx.g(xx)) (λx.g(xx))
