@@ -59,7 +59,7 @@
 <p>Armed with this, we can reimplement as a two argument curried function:</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb8-1" title="1">  <span class="kw">def</span> rec[A, B]: ((A =&gt; A) =&gt; (A =&gt; A)) =&gt; A =&gt; A =</a>
 <a class="sourceLine" id="cb8-2" title="2">    f =&gt; a =&gt; <span class="fu">f</span>(<span class="fu">rec</span>(f))(a)</a></code></pre></div>
-<p>And this doesn’t stack overflow. The code <code>f(fix(f))</code> still executes eagerly but it only partially applies the two argument function. It acts as a lazy evaluation thunk, somewhere like in Haskell.</p>
+<p>And this doesn’t stack overflow. The code <code>f(fix(f))</code> still executes eagerly but it only partially applies the two argument function. It acts as a lazy evaluation thunk, somewhat like in Haskell.</p>
 <p>And we are done.</p>
 
         </div>
