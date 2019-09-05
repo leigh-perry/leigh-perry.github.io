@@ -45,7 +45,8 @@
 <a class="sourceLine" id="cb1-12" title="12">}</a></code></pre></div>
 <p>See <a href="http://adit.io/posts/2013-04-17-functors,_applicatives,_and_monads_in_pictures.html">this explanation</a> for some illuminating visualisations.</p>
 <p><code>Functor</code> and <code>Monad</code> make intuitive sense once you get used to what they do. But <code>Applicative</code> was a different matter. It has that weird <code>ap</code> method, that takes as a parameter <code>ff</code> which is a function from <code>A</code> to <code>B</code> in the effect <code>F</code>. I don’t know about you, but I don’t often end up with a function in an effect. Probably never. So what is it about?</p>
-<h1 id="ff-fa-b-what"><code>ff: F[A =&gt; B]</code> what?</h1>
+<h1 id="what">What?</h1>
+<p><code>ff: F[A =&gt; B]</code>?</p>
 <p>It turns out that you end up with a function in <code>F</code> when you use <code>Functor.map</code> with a function that takes more than one argument. (For this to happen, the function must be in curried form <code>A =&gt; B =&gt; C</code> rather than the more Scala-idiomatic <code>(A, B) =&gt; C</code> uncurried form).</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb2-1" title="1">  <span class="kw">val</span> f: A =&gt; B =&gt; C = ...</a>
 <a class="sourceLine" id="cb2-2" title="2">  <span class="kw">val</span> o: Option[A] = a.<span class="fu">some</span></a>
