@@ -10,7 +10,7 @@ pause() {
   fi
 }
 
-gqc New content
+gqc Publish site
 stack build ; stack exec blog clean ; stack exec blog build
 pause
 echo continue

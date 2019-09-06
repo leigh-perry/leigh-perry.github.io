@@ -55,7 +55,7 @@ This still stack overflows, but we can change it again slightly to reflect that 
     f => f(rec(f))
 ``` 
 Looking at this as a curried function, it has two argument.
-First the function `((A => A) => (A => A))``` that is to be fixed.
+First the function `((A => A) => (A => A))` that is to be fixed.
 The second argument is an `A`.
 This leaves just the return value of type `A`.
 
@@ -66,6 +66,6 @@ Armed with this, we can reimplement as a two argument curried function:
 ``` 
 
 And this doesn't stack overflow. The code `f(fix(f))` still executes eagerly but it only
-partially applies the two argument function. It acts as a lazy evaluation thunk, somewhere like in Haskell. 
+partially applies the two argument function. It acts as a lazy evaluation thunk, somewhat like in Haskell. 
 
 And we are done.
