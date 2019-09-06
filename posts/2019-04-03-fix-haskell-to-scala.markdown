@@ -2,7 +2,7 @@
 title: Converting Haskell's fix function to Scala
 ---
 
-[This article](/posts/2019-04-01-fix-haskell-function.html) introduces the `fix` function – the essence of recursion.
+[That article](/posts/2019-04-01-fix-haskell-function.html) introduces the `fix` function – the essence of recursion.
 It was neatly expressed in Haskell. 
 In fact, the implementation is almost identical to the lambda calculus version, probably because
 Haskell's syntax was itself based on lambda calculus.
