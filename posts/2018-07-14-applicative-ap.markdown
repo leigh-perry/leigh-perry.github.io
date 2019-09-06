@@ -25,14 +25,14 @@ See [this explanation](http://adit.io/posts/2013-04-17-functors,_applicatives,_a
 `Functor` and `Monad` make intuitive sense once you get used to what they do.
 But `Applicative` was a different matter.
 It has that weird `ap` method, that takes as a parameter `ff` which is a function from `A` to `B` in the effect `F`.
-I don't know about you, but I don't often end up with a function in an effect.
-Probably never.
-So what is it about?
-
 
 # What?
 
 `ff: F[A => B]`?
+
+I don't know about you, but I don't often end up with a function in an effect.
+Probably never.
+So what is it about?
 
 It turns out that you end up with a function in `F` when you use `Functor.map` with a function that takes more than one argument.
 (For this to happen, the function must be in curried form `A => B => C` rather than the more Scala-idiomatic `(A, B) => C` uncurried form).
