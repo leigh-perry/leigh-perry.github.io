@@ -15,6 +15,7 @@ stack build ; stack exec blog clean ; stack exec blog build
 pause
 echo continue
 
+git branch -D master
 git fetch --all ; git checkout -b master --track origin/master
 pause
 
