@@ -2,7 +2,7 @@
 title: Converting Haskell's fix function to Scala
 ---
 
-[That article](/posts/2019-04-01-fix-haskell-function.html) introduces the `fix` function – the essence of recursion.
+[That article](/posts/2019-04-01-fix-haskell-function.html) introduces the `fix` function – the essence of fixursion.
 It was neatly expressed in Haskell. 
 In fact, the implementation is almost identical to the lambda calculus version, probably because
 Haskell's syntax was itself based on lambda calculus.
@@ -45,14 +45,14 @@ and
 we see that in this case, `T` is actually `Int => Int`.
 Therefore `fix` can be expanded to reflect that `T` is a function from `A => A`:
 ```scala
-  def rec[A, B]: ((A => A) => (A => A)) => (A => A) =
-    f => f(rec(f))
+  def fix[A, B]: ((A => A) => (A => A)) => (A => A) =
+    f => f(fix(f))
 ``` 
 This still stack overflows, but we can change it again slightly to reflect that brackets around the rightmost
 `A => A` were redundant: 
 ```scala
-  def rec[A, B]: ((A => A) => (A => A)) => A => A =
-    f => f(rec(f))
+  def fix[A, B]: ((A => A) => (A => A)) => A => A =
+    f => f(fix(f))
 ``` 
 Looking at this as a curried function, it has two argument.
 First the function `((A => A) => (A => A))` that is to be fixed.
@@ -61,8 +61,8 @@ This leaves just the return value of type `A`.
 
 Armed with this, we can reimplement as a two argument curried function:
 ```scala
-  def rec[A, B]: ((A => A) => (A => A)) => A => A =
-    f => a => f(rec(f))(a)
+  def fix[A, B]: ((A => A) => (A => A)) => A => A =
+    f => a => f(fix(f))(a)
 ``` 
 
 And this doesn't stack overflow. The code `f(fix(f))` still executes eagerly but it only
