@@ -30,7 +30,7 @@
     
 </div>
 
-<p><a href="../posts/2019-04-01-fix-haskell-function.html">This article</a> introduces the <code>fix</code> function – the essence of recursion. It was neatly expressed in Haskell. In fact, the implementation is almost identical to the lambda calculus version, probably because Haskell’s syntax was itself based on lambda calculus.</p>
+<p><a href="../posts/2019-04-01-fix-haskell-function.html">That article</a> introduces the <code>fix</code> function – the essence of fixursion. It was neatly expressed in Haskell. In fact, the implementation is almost identical to the lambda calculus version, probably because Haskell’s syntax was itself based on lambda calculus.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb1-1" title="1"><span class="ot">fix ::</span> (t <span class="ot">-&gt;</span> t) <span class="ot">-&gt;</span> t</a>
 <a class="sourceLine" id="cb1-2" title="2">fix g <span class="fu">=</span> g (fix g)</a></code></pre></div>
 <p>How to implement this in Scala? A naive port yields this:</p>
@@ -50,15 +50,15 @@
 <p>and</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb5-1" title="1">  <span class="kw">def</span> factorial: (Int =&gt; Int) =&gt; Int =&gt; Int = ...</a></code></pre></div>
 <p>we see that in this case, <code>T</code> is actually <code>Int =&gt; Int</code>. Therefore <code>fix</code> can be expanded to reflect that <code>T</code> is a function from <code>A =&gt; A</code>:</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb6-1" title="1">  <span class="kw">def</span> rec[A, B]: ((A =&gt; A) =&gt; (A =&gt; A)) =&gt; (A =&gt; A) =</a>
-<a class="sourceLine" id="cb6-2" title="2">    f =&gt; <span class="fu">f</span>(<span class="fu">rec</span>(f))</a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb6-1" title="1">  <span class="kw">def</span> fix[A, B]: ((A =&gt; A) =&gt; (A =&gt; A)) =&gt; (A =&gt; A) =</a>
+<a class="sourceLine" id="cb6-2" title="2">    f =&gt; <span class="fu">f</span>(<span class="fu">fix</span>(f))</a></code></pre></div>
 <p>This still stack overflows, but we can change it again slightly to reflect that brackets around the rightmost <code>A =&gt; A</code> were redundant:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb7-1" title="1">  <span class="kw">def</span> rec[A, B]: ((A =&gt; A) =&gt; (A =&gt; A)) =&gt; A =&gt; A =</a>
-<a class="sourceLine" id="cb7-2" title="2">    f =&gt; <span class="fu">f</span>(<span class="fu">rec</span>(f))</a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb7-1" title="1">  <span class="kw">def</span> fix[A, B]: ((A =&gt; A) =&gt; (A =&gt; A)) =&gt; A =&gt; A =</a>
+<a class="sourceLine" id="cb7-2" title="2">    f =&gt; <span class="fu">f</span>(<span class="fu">fix</span>(f))</a></code></pre></div>
 <p>Looking at this as a curried function, it has two argument. First the function <code>((A =&gt; A) =&gt; (A =&gt; A))</code> that is to be fixed. The second argument is an <code>A</code>. This leaves just the return value of type <code>A</code>.</p>
 <p>Armed with this, we can reimplement as a two argument curried function:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb8-1" title="1">  <span class="kw">def</span> rec[A, B]: ((A =&gt; A) =&gt; (A =&gt; A)) =&gt; A =&gt; A =</a>
-<a class="sourceLine" id="cb8-2" title="2">    f =&gt; a =&gt; <span class="fu">f</span>(<span class="fu">rec</span>(f))(a)</a></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb8-1" title="1">  <span class="kw">def</span> fix[A, B]: ((A =&gt; A) =&gt; (A =&gt; A)) =&gt; A =&gt; A =</a>
+<a class="sourceLine" id="cb8-2" title="2">    f =&gt; a =&gt; <span class="fu">f</span>(<span class="fu">fix</span>(f))(a)</a></code></pre></div>
 <p>And this doesn’t stack overflow. The code <code>f(fix(f))</code> still executes eagerly but it only partially applies the two argument function. It acts as a lazy evaluation thunk, somewhat like in Haskell.</p>
 <p>And we are done.</p>
 

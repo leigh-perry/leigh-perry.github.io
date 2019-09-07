@@ -30,7 +30,16 @@
     
 </div>
 
-<p>TODO</p>
+<p><a href="../posts/2019-04-03-fix-haskell-to-scala.html">That article</a> derives the <code>fix</code> function – the essence of recursion – for Scala.</p>
+<p>But as well as recursive functions, Fix also describes data structures. Let’s follow the process of converting the <code>fix</code> function to a data structure. As I showed in <a href="../posts/2019-04-01-fix-haskell-function.html">the original article</a>, the Haskell function is defined:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb1-1" title="1">fix f <span class="fu">=</span> f (fix f)</a></code></pre></div>
+<p>First, replace the argument polymorphism with type polymorphism. This is more or less just capitalising the names and wrapping type parameters in square brackets:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb2-1" title="1"><span class="kw">final</span> <span class="kw">case</span> <span class="kw">class</span> Fix[F](f: F[Fix[F]])</a></code></pre></div>
+<p>This doesn’t quite compile, since <code>F</code> itself has to take a type parameter, so must be <code>F[_]</code>:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb3-1" title="1"><span class="kw">final</span> <span class="kw">case</span> <span class="kw">class</span> Fix[F[_]](f: F[Fix[F]])</a></code></pre></div>
+<p>The fixed data item <code>f</code> is usually called <code>unfix</code>:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb4-1" title="1"><span class="kw">final</span> <span class="kw">case</span> <span class="kw">class</span> Fix[F[_]](unfix: F[Fix[F]])</a></code></pre></div>
+<p>Sorted.</p>
 
         </div>
         <div id="footer">
