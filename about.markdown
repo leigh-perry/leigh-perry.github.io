@@ -19,4 +19,4 @@ They are more a record of thoughts and learnings that might interest other engin
 
 You might also be interested in my [photography website](http://www.leighperry.com/).
 Photography and playing the acoustic guitar give me alternative creative outlets to the
-also-creative outlet of software engineering.
+possibly-surprisingly-creative outlet that is software engineering.
