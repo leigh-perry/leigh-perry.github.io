@@ -44,7 +44,7 @@ main =
         posts <- recentFirst =<< loadAll "posts/*"
         let indexCtx =
               listField "posts" postCtx (return posts) `mappend` constField "title" "Home" `mappend` defaultContext
-        getResourceBody >>= applyAsTemplate indexCtx >>= loadAndApplyTemplate "templates/default.html" indexCtx >>=
+        getResourceBody >>= applyAsTemplate indexCtx >>= loadAndApplyTemplate "templates/rightimages.html" indexCtx >>=
           relativizeUrls
     match "templates/*" $ compile templateCompiler
     feed "atom.xml" renderAtom
