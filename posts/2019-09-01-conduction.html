@@ -69,7 +69,7 @@
 <p>In writing the library, I had some ambitions.</p>
 <ul>
 <li>I wanted it to be pure-functional.</li>
-<li>It should be extensibility – allow the user to:
+<li>It should be extensible – allow the user to:
 <ul>
 <li>add new primitive types,</li>
 <li>add new complex types,</li>
@@ -157,7 +157,7 @@
 <a class="sourceLine" id="cb10-5" title="5">      Conversion[Double].<span class="fu">map</span>(Latitude.<span class="fu">apply</span>)</a>
 <a class="sourceLine" id="cb10-6" title="6">  }</a></code></pre></div>
 <h2 id="moving-to-reader-monad">Moving to Reader monad</h2>
-<p>Take a look at the <code>Configured</code> instance for <code>Endpoint</code>, above. The <code>Environment</code> parameter is being passed explicitly around. This represents a functional-programming-opportunity™ that is difficult to resist. I changed over the the Reader monad, which now takes care of making that <code>Environment</code> instance available:</p>
+<p>Take a look at the <code>Configured</code> instance for <code>Endpoint</code>, above. The <code>Environment</code> parameter is being passed explicitly around. This represents a functional-programming-opportunity™ that is difficult to resist. I changed over to the Reader monad, which now takes care of making that <code>Environment</code> instance available:</p>
 <pre><code>trait Configured[F[_], A] {
   def value(name: String): Kleisli[F, Environment, ValidatedNec[ConfiguredError, A]]
   :
