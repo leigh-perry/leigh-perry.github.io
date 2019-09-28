@@ -58,7 +58,7 @@ You can read more over at the Conduction [documentation page](https://github.com
 In writing the library, I had some ambitions.
 
 - I wanted it to be pure-functional.
-- It should be extensibility – allow the user to:
+- It should be extensible – allow the user to:
   - add new primitive types,
   - add new complex types,
   - add other _effects_ beyond `Option`, `List`, `Either`, etc.
@@ -176,7 +176,7 @@ Even better, they could repurpose an existing type for their new type via `Funct
 
 Take a look at the `Configured` instance for `Endpoint`, above. The `Environment` parameter is being passed explicitly around.
 This represents a functional-programming-opportunity™ that is difficult to resist.
-I changed over the the Reader monad, which now takes care of making that `Environment` instance available:
+I changed over to the Reader monad, which now takes care of making that `Environment` instance available:
 ```
 trait Configured[F[_], A] {
   def value(name: String): Kleisli[F, Environment, ValidatedNec[ConfiguredError, A]]
