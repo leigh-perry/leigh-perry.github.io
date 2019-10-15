@@ -61,7 +61,11 @@
 <p>But it doesn’t do anything about the second point.</p>
 <h1 id="abstracting-effects">Abstracting Effects</h1>
 <p>Using monad stacks like <code>ExceptT</code> has a downside. You end up with some deeply unattractive function signatures, returning <code>ExceptT AnalyserError IO a</code> instead of just <code>a</code>. The standard solution to this is to abstract the returned effect (<code>ExceptT</code> in this case) by declaring required capabilities instead. This is called <em>MTL-style</em>. MTL stands for monad transformer library, but the name is anachronistic and doesn’t fully apply to the contemporary meaning of the MTL acronym.</p>
-<p>Anyway, there are two effects we need to cater for. - <code>ExceptT</code> allows for returning error indications, eg <code>AnalyserError</code>, in this case. - <code>IO</code> allows for side-effects, eg reading a file.</p>
+<p>Anyway, there are two effects we need to cater for.</p>
+<ul>
+<li><code>ExceptT</code> allows for returning error indications, eg <code>AnalyserError</code>, in this case.</li>
+<li><code>IO</code> allows for side-effects, eg reading a file.</li>
+</ul>
 <p>The first is modelled via <code>MonadError</code>, and the second via <code>MonadIO</code>.</p>
 <p>Refactoring the application, it becomes:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb4-1" title="1"><span class="ot">parseEntryFile ::</span> (<span class="dt">MonadError</span> <span class="dt">AnalyserError</span> m, <span class="dt">MonadIO</span> m) <span class="ot">=&gt;</span> <span class="dt">String</span> <span class="ot">-&gt;</span> m [<span class="dt">CsvEntry</span>]</a>
