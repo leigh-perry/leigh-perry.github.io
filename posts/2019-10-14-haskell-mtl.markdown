@@ -74,6 +74,7 @@ MTL stands for monad transformer library, but the name is anachronistic and does
 to the contemporary meaning of the MTL acronym.
 
 Anyway, there are two effects we need to cater for.
+
 - `ExceptT` allows for returning error indications, eg `AnalyserError`, in this case.
 - `IO` allows for side-effects, eg reading a file.
 
