@@ -1,5 +1,5 @@
 ---
-title: Abstracting effects using MTL-style
+title: Abstracting effects MTL-style
 ---
 
 Naively implementating an application in Haskell might use `error` to throw exceptions under, well, exceptional conditions,
@@ -142,15 +142,16 @@ This clearly gives an improvement in testability, allowing stub implementations 
 
 All that remains now is to provide the promised `FileOps` in the caller.
 This is done by providing a typeclass instance for `FileOps` that is specialised 
-for `ExceptT` and `IO`, which matches the original pre-mtl implementation of the application's `main`.
+for `ExceptT` and `IO`, which matches the original pre-MTL implementation of the application's `main`.
 ```haskell
 instance FileOps (ExceptT AnalyserError IO) where
   readBinFile a = lift $ BL.readFile a
 ```
 
 A slight Haskell complexity arises at this point.
-Haskell only allows typeclass instances for fully-saturated types (kind `*`), whereas
-`ExceptT AnalyserError IO` is partial application of `ExceptT e m a` (kind `* -> *`).
+Haskell only allows typeclass instances for fully-saturated types (designated by kind `*`), whereas
+`ExceptT AnalyserError IO` is partial application of `ExceptT e m a`, ie only `e` and `m` are specified, leaving a type hole for `a`.
+(This is designated by kind `* -> *`.)
 
 To get around this you need to enable `{-# LANGUAGE FlexibleInstances #-}`.
 
