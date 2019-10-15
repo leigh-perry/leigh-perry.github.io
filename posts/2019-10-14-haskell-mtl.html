@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <title>Sesquipedalia - Abstracting effects using MTL-style</title>
+        <title>Sesquipedalia - Abstracting effects MTL-style</title>
         <link rel="stylesheet" type="text/css" href="../css/default.css" />
         <link rel="alternate" type="application/rss+xml" title="Sesquipedalia" href="../feed.xml">
         <link rel="alternate" type="application/atom+xml" title="Sesquipedalia" href="../atom.xml">
@@ -23,7 +23,7 @@
         </div>
 
         <div id="content">
-            <h1>Abstracting effects using MTL-style</h1>
+            <h1>Abstracting effects MTL-style</h1>
 
             <div class="info">
     Posted on October 14, 2019
@@ -91,10 +91,10 @@
 <a class="sourceLine" id="cb6-5" title="5">  liftEither <span class="fu">$</span> bimap <span class="dt">ParseEntryError</span> (toList <span class="fu">.</span> <span class="fu">snd</span>) d</a></code></pre></div>
 <p>The function now expresses a requirement for the <code>FileOps</code> capability, and that capability’s one function <code>readBinFile</code> is employed via <code>readBinFile filepath</code>. This approach tells callers of <code>parseEntryFile</code> that they need to provide <em>a means of reading a byte-string file</em>. It doesn’t say how it is expected to be done. This clearly gives an improvement in testability, allowing stub implementations to be used in unit test suites.</p>
 <h2 id="fulfilling-the-capability">Fulfilling the capability</h2>
-<p>All that remains now is to provide the promised <code>FileOps</code> in the caller. This is done by providing a typeclass instance for <code>FileOps</code> that is specialised for <code>ExceptT</code> and <code>IO</code>, which matches the original pre-mtl implementation of the application’s <code>main</code>.</p>
+<p>All that remains now is to provide the promised <code>FileOps</code> in the caller. This is done by providing a typeclass instance for <code>FileOps</code> that is specialised for <code>ExceptT</code> and <code>IO</code>, which matches the original pre-MTL implementation of the application’s <code>main</code>.</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode haskell"><code class="sourceCode haskell"><a class="sourceLine" id="cb7-1" title="1"><span class="kw">instance</span> <span class="dt">FileOps</span> (<span class="dt">ExceptT</span> <span class="dt">AnalyserError</span> <span class="dt">IO</span>) <span class="kw">where</span></a>
 <a class="sourceLine" id="cb7-2" title="2">  readBinFile a <span class="fu">=</span> lift <span class="fu">$</span> BL.readFile a</a></code></pre></div>
-<p>A slight Haskell complexity arises at this point. Haskell only allows typeclass instances for fully-saturated types (kind <code>*</code>), whereas <code>ExceptT AnalyserError IO</code> is partial application of <code>ExceptT e m a</code> (kind <code>* -&gt; *</code>).</p>
+<p>A slight Haskell complexity arises at this point. Haskell only allows typeclass instances for fully-saturated types (designated by kind <code>*</code>), whereas <code>ExceptT AnalyserError IO</code> is partial application of <code>ExceptT e m a</code>, ie only <code>e</code> and <code>m</code> are specified, leaving a type hole for <code>a</code>. (This is designated by kind <code>* -&gt; *</code>.)</p>
 <p>To get around this you need to enable <code>{-# LANGUAGE FlexibleInstances #-}</code>.</p>
 <p>Now to actually write some tests to exploit this new-found flexibility.</p>
 
