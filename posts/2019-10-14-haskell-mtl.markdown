@@ -151,7 +151,7 @@ instance FileOps (ExceptT AnalyserError IO) where
 A slight Haskell complexity arises at this point.
 Haskell only allows typeclass instances for fully-saturated types, designated by kind `*`.
 However, `ExceptT AnalyserError IO` is partial application of `ExceptT e m a`, ie only `e` and `m` are specified, leaving a type hole for `a`.
-(This is designated by kind `* -> *`.)
+This is designated by kind `* -> *`.
 
 To get around this compiler limitation, you need to enable `{-# LANGUAGE FlexibleInstances #-}`.
 Haskell then accepts the typeclass instance for the partially-saturated `ExceptT AnalyserError IO`.
