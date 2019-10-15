@@ -8,8 +8,16 @@
         <name>Leigh Perry</name>
         <email>lperry.breakpoint@gmail.com</email>
     </author>
-    <updated>2019-09-01T00:00:00Z</updated>
+    <updated>2019-10-14T00:00:00Z</updated>
     <entry>
+    <title>Abstracting effects using MTL-style</title>
+    <link href="https://leigh-perry.github.io/posts/2019-10-14-haskell-mtl.html" />
+    <id>https://leigh-perry.github.io/posts/2019-10-14-haskell-mtl.html</id>
+    <published>2019-10-14T00:00:00Z</published>
+    <updated>2019-10-14T00:00:00Z</updated>
+    <summary type="html"><![CDATA[Another post from Leigh]]></summary>
+</entry>
+<entry>
     <title>Design of a configuration library</title>
     <link href="https://leigh-perry.github.io/posts/2019-09-01-conduction.html" />
     <id>https://leigh-perry.github.io/posts/2019-09-01-conduction.html</id>
