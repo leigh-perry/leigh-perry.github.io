@@ -1,8 +1,8 @@
 ---
-title: Applicatives and Monoids 
+title: Monoidal aggregation via Traverse 
 ---
 
-Lukewarm on the heels of my [monoidal meditation](https://leigh-perry.github.io/posts/2019-11-11-monoids-2.html),
+Lukewarm on the heels of my series of [monoidal meditation](https://leigh-perry.github.io/posts/2019-11-13-monoids-function.html),
 it is time to examine the connection between `Applicative` and `Monoid` typeclasses. 
 
 # Similarities

@@ -2,8 +2,8 @@
 title: Function Monoids 
 ---
 
-In [this article](https://leigh-perry.github.io/posts/2019-10-25-monoids-1.html)
-I talked about how tuple monoids.
+[Earlier](https://leigh-perry.github.io/posts/2019-10-25-monoids-singlepass.html)
+in this series, I talked about how tuple monoids.
 
 This time it is monoids for functions. 
 

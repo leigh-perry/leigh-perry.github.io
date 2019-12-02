@@ -2,7 +2,8 @@
 title: Inductive Monoids 
 ---
 
-In [this article](https://leigh-perry.github.io/posts/2019-10-25-monoids-1.html)
+In the [first article](https://leigh-perry.github.io/posts/2019-10-25-monoids-singlepass.html)
+in this series,
 I talked about how monoids support multiple aggregations via _product composition_.
 
 Well, they also compose in other ways. 
