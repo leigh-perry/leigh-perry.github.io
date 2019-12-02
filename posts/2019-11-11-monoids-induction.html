@@ -30,7 +30,7 @@
     
 </div>
 
-<p>In <a href="https://leigh-perry.github.io/posts/2019-10-25-monoids-1.html">this article</a> I talked about how monoids support multiple aggregations via <em>product composition</em>.</p>
+<p>In the <a href="https://leigh-perry.github.io/posts/2019-10-25-monoids-singlepass.html">first article</a> in this series, I talked about how monoids support multiple aggregations via <em>product composition</em>.</p>
 <p>Well, they also compose in other ways.</p>
 <h1 id="inductive-composition-of-semigroup">Inductive composition of Semigroup</h1>
 <p>Some data structures have a <code>Semigroup</code> instance but are unable to support a <code>Monoid</code>. The canonical example of this is <code>NonEmptyList</code>. There is no natural <code>empty</code> value for <code>NonEmptyList</code>, by, well, by definition.</p>

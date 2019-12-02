@@ -18,7 +18,7 @@
     <summary type="html"><![CDATA[Another post from Leigh]]></summary>
 </entry>
 <entry>
-    <title>Applicatives and Monoids</title>
+    <title>Monoidal aggregation via Traverse</title>
     <link href="https://leigh-perry.github.io/posts/2019-11-16-monoids-applicative.html" />
     <id>https://leigh-perry.github.io/posts/2019-11-16-monoids-applicative.html</id>
     <published>2019-11-16T00:00:00Z</published>

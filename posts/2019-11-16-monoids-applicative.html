@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <title>Sesquipedalia - Applicatives and Monoids</title>
+        <title>Sesquipedalia - Monoidal aggregation via Traverse</title>
         <link rel="stylesheet" type="text/css" href="../css/default.css" />
         <link rel="alternate" type="application/rss+xml" title="Sesquipedalia" href="../feed.xml">
         <link rel="alternate" type="application/atom+xml" title="Sesquipedalia" href="../atom.xml">
@@ -23,14 +23,14 @@
         </div>
 
         <div id="content">
-            <h1>Applicatives and Monoids</h1>
+            <h1>Monoidal aggregation via Traverse</h1>
 
             <div class="info">
     Posted on November 16, 2019
     
 </div>
 
-<p>Lukewarm on the heels of my <a href="https://leigh-perry.github.io/posts/2019-11-11-monoids-2.html">monoidal meditation</a>, it is time to examine the connection between <code>Applicative</code> and <code>Monoid</code> typeclasses.</p>
+<p>Lukewarm on the heels of my series of <a href="https://leigh-perry.github.io/posts/2019-11-13-monoids-function.html">monoidal meditation</a>, it is time to examine the connection between <code>Applicative</code> and <code>Monoid</code> typeclasses.</p>
 <h1 id="similarities">Similarities</h1>
 <p>Looking at the typeclasses for <code>Applicative</code></p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb1-1" title="1"><span class="kw">trait</span> Applicative[F[_]] <span class="kw">extends</span> Functor[F] {</a>

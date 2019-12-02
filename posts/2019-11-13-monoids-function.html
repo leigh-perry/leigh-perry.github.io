@@ -30,7 +30,7 @@
     
 </div>
 
-<p>In <a href="https://leigh-perry.github.io/posts/2019-10-25-monoids-1.html">this article</a> I talked about how tuple monoids.</p>
+<p><a href="https://leigh-perry.github.io/posts/2019-10-25-monoids-singlepass.html">Earlier</a> in this series, I talked about how tuple monoids.</p>
 <p>This time it is monoids for functions.</p>
 <h1 id="inductive-monoid-for-functions">Inductive Monoid for functions</h1>
 <p>If a type <code>B</code> has a <code>Monoid</code> instance, then so does any function <code>A =&gt; B</code>. When combining, the <code>Semigroup</code> instance gathers the output of two functions and combines the values using the underlying <code>Monoid[B]</code>.</p>
