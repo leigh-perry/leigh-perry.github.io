@@ -14,18 +14,18 @@ When combining, the `Semigroup` instance gathers the output of two functions
 and combines the values using the underlying `Monoid[B]`.
 ```scala
 trait Function1Semigroup[A, B] extends Semigroup[A => B] {
- implicit def B: Semigroup[B]
-
- override def combine(x: A => B, y: A => B): A => B =
-   (a: A) => B.combine(x(a), y(a))
+  implicit def B: Semigroup[B]
+ 
+  override def combine(x: A => B, y: A => B): A => B =
+    (a: A) => B.combine(x(a), y(a))
 }
 
 trait Function1Monoid[A, B]
   extends Function1Semigroup[A, B] with Monoid[A => B] {
- implicit def B: Monoid[B]
-
- val empty: A => B =
-   (_: A) => B.empty
+  implicit def B: Monoid[B]
+ 
+  val empty: A => B =
+    (_: A) => B.empty
 }
 ```
 
