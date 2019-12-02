@@ -8,9 +8,17 @@
         <name>Leigh Perry</name>
         <email>lperry.breakpoint@gmail.com</email>
     </author>
-    <updated>2019-11-11T00:00:00Z</updated>
+    <updated>2019-11-16T00:00:00Z</updated>
     <entry>
-    <title>Inductive monoids</title>
+    <title>Applicatives and Monoids</title>
+    <link href="https://leigh-perry.github.io/posts/2019-11-16-monoids-4.html" />
+    <id>https://leigh-perry.github.io/posts/2019-11-16-monoids-4.html</id>
+    <published>2019-11-16T00:00:00Z</published>
+    <updated>2019-11-16T00:00:00Z</updated>
+    <summary type="html"><![CDATA[Another post from Leigh]]></summary>
+</entry>
+<entry>
+    <title>Inductive Monoids</title>
     <link href="https://leigh-perry.github.io/posts/2019-11-11-monoids-2.html" />
     <id>https://leigh-perry.github.io/posts/2019-11-11-monoids-2.html</id>
     <published>2019-11-11T00:00:00Z</published>
@@ -79,14 +87,6 @@
     <id>https://leigh-perry.github.io/posts/2018-11-23-generating-functions.html</id>
     <published>2018-11-23T00:00:00Z</published>
     <updated>2018-11-23T00:00:00Z</updated>
-    <summary type="html"><![CDATA[Another post from Leigh]]></summary>
-</entry>
-<entry>
-    <title>The mystery of Applicative's <*> operator (ap)</title>
-    <link href="https://leigh-perry.github.io/posts/2018-07-14-applicative-ap.html" />
-    <id>https://leigh-perry.github.io/posts/2018-07-14-applicative-ap.html</id>
-    <published>2018-07-14T00:00:00Z</published>
-    <updated>2018-07-14T00:00:00Z</updated>
     <summary type="html"><![CDATA[Another post from Leigh]]></summary>
 </entry>
 

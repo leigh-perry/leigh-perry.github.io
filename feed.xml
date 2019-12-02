@@ -7,9 +7,17 @@
         <description><![CDATA[Ephema is a software engineering blog by Leigh Perry]]></description>
         <atom:link href="https://leigh-perry.github.io/feed.xml" rel="self"
                    type="application/rss+xml" />
-        <lastBuildDate>Mon, 11 Nov 2019 00:00:00 UT</lastBuildDate>
+        <lastBuildDate>Sat, 16 Nov 2019 00:00:00 UT</lastBuildDate>
         <item>
-    <title>Inductive monoids</title>
+    <title>Applicatives and Monoids</title>
+    <link>https://leigh-perry.github.io/posts/2019-11-16-monoids-4.html</link>
+    <description><![CDATA[Another post from Leigh]]></description>
+    <pubDate>Sat, 16 Nov 2019 00:00:00 UT</pubDate>
+    <guid>https://leigh-perry.github.io/posts/2019-11-16-monoids-4.html</guid>
+    <dc:creator>Leigh Perry</dc:creator>
+</item>
+<item>
+    <title>Inductive Monoids</title>
     <link>https://leigh-perry.github.io/posts/2019-11-11-monoids-2.html</link>
     <description><![CDATA[Another post from Leigh]]></description>
     <pubDate>Mon, 11 Nov 2019 00:00:00 UT</pubDate>
@@ -78,14 +86,6 @@
     <description><![CDATA[Another post from Leigh]]></description>
     <pubDate>Fri, 23 Nov 2018 00:00:00 UT</pubDate>
     <guid>https://leigh-perry.github.io/posts/2018-11-23-generating-functions.html</guid>
-    <dc:creator>Leigh Perry</dc:creator>
-</item>
-<item>
-    <title>The mystery of Applicative's <*> operator (ap)</title>
-    <link>https://leigh-perry.github.io/posts/2018-07-14-applicative-ap.html</link>
-    <description><![CDATA[Another post from Leigh]]></description>
-    <pubDate>Sat, 14 Jul 2018 00:00:00 UT</pubDate>
-    <guid>https://leigh-perry.github.io/posts/2018-07-14-applicative-ap.html</guid>
     <dc:creator>Leigh Perry</dc:creator>
 </item>
 
