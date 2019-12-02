@@ -51,18 +51,18 @@ trait Function1Monoid[A, B]
 > is equivalent to `int2IntFunctions.fold`.
 
 Output is
-```
-0 => 6
-1 => 13
-2 => 22
-3 => 33
-4 => 46
-5 => 61
-6 => 78
-7 => 97
-8 => 118
-9 => 141
-10 => 166
+```scala
+    0 => 6
+    1 => 13
+    2 => 22
+    3 => 33
+    4 => 46
+    5 => 61
+    6 => 78
+    7 => 97
+    8 => 118
+    9 => 141
+    10 => 166
 ```
 
 The function monoid combines the three functions in `int2IntFunctions`, 
@@ -100,18 +100,18 @@ This time
   }
 ```
 yields
-```
-0 => Max(6)
-1 => Max(7)
-2 => Max(10)
-3 => Max(15)
-4 => Max(20)
-5 => Max(25)
-6 => Max(36)
-7 => Max(49)
-8 => Max(64)
-9 => Max(81)
-10 => Max(100)
+```scala
+    0 => Max(6)
+    1 => Max(7)
+    2 => Max(10)
+    3 => Max(15)
+    4 => Max(20)
+    5 => Max(25)
+    6 => Max(36)
+    7 => Max(49)
+    8 => Max(64)
+    9 => Max(81)
+    10 => Max(100)
 ```
 
 Behaviour is similar to the previous, however, this time the monoid
