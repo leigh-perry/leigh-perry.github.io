@@ -1,5 +1,5 @@
 ---
-title: Monoids for single pass aggregations
+title: Inductive monoids 
 ---
 
 In [this article](https://leigh-perry.github.io/posts/2019-10-25-monoids-1.html)
