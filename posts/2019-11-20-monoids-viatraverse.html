@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>Sesquipedalia - Applicatives and Monoids</title>
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="alternate" type="application/rss+xml" title="Sesquipedalia" href="../feed.xml">
+        <link rel="alternate" type="application/atom+xml" title="Sesquipedalia" href="../atom.xml">
+        <link rel="shortcut icon" href="../site/favicon.ico">
+    </head>
+    <body>
+        <div id="header">
+            <div id="logo">
+                <a href="../">Sesquipedalia</a>
+            </div>
+            <div id="navigation">
+                <a href="../index.html">Home</a>
+                <a href="../about.html">About</a>
+                <a href="../contact.html">Contact</a>
+                <a href="../archive.html">Archive</a>
+            </div>
+        </div>
+
+        <div id="content">
+            <h1>Applicatives and Monoids</h1>
+
+            <div class="info">
+    Posted on November 20, 2019
+    
+</div>
+
+<p>Lukewarm on the heels of <a href="https://leigh-perry.github.io/posts/2019-11-11-monoids-2.html">this article</a>, it is time to examine the connection between <code>Applicative</code> and <code>Monoid</code> typeclasses.</p>
+<h1 id="similarities">Similarities</h1>
+<p>Looking at the typeclasses for <code>Applicative</code></p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb1-1" title="1"><span class="kw">trait</span> Applicative[F[_]] <span class="kw">extends</span> Functor[F] {</a>
+<a class="sourceLine" id="cb1-2" title="2"> <span class="kw">def</span> pure[A](a: A): F[A]</a>
+<a class="sourceLine" id="cb1-3" title="3"> <span class="kw">def</span> ap[A, B](fa: F[A])(ff: F[A =&gt; B]): F[B]</a>
+<a class="sourceLine" id="cb1-4" title="4">}</a></code></pre></div>
+<p>and <code>Monoid</code></p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb2-1" title="1"><span class="kw">trait</span> Monoid[A] {</a>
+<a class="sourceLine" id="cb2-2" title="2">  <span class="kw">def</span> empty: A</a>
+<a class="sourceLine" id="cb2-3" title="3">  <span class="kw">def</span> <span class="fu">combine</span>(x: A, y: A): A</a>
+<a class="sourceLine" id="cb2-4" title="4">}</a></code></pre></div>
+<p>there are similarities. Each has a kind of ‘unit’ function (<code>pure</code> and <code>empty</code>), and each has a combination function (<code>ap</code> and <code>combine</code>). It should come as no surprise, since the category theory for <code>Applicative</code> is <em>lax monoidal functor</em>, since it represents monoidal combination inside effects.</p>
+<h1 id="interchangeability">Interchangeability</h1>
+<p>It turns out that we can</p>
+<ul>
+<li>create a <code>Monoid</code> instance for any <code>Applicative</code></li>
+<li>promote any <code>Monoid</code> to an <code>Applicative</code></li>
+</ul>
+<p>How?</p>
+<h2 id="monoid-instance-for-any-applicative">Monoid instance for any Applicative</h2>
+<p>This is easy. To create a <code>Monoid[F[A]]</code> where <code>F</code> has an <code>Applicative</code> instance, just wrap the <code>empty</code> value with <code>pure</code>, and use the <code>Applicative</code> combination.</p>
+<p>With this</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb3-1" title="1">    <span class="kw">implicit</span> <span class="kw">def</span> monoidForApplicative[F[_], A](</a>
+<a class="sourceLine" id="cb3-2" title="2">      <span class="kw">implicit</span> F: Applicative[F],</a>
+<a class="sourceLine" id="cb3-3" title="3">      M: Monoid[A]</a>
+<a class="sourceLine" id="cb3-4" title="4">    ): Monoid[F[A]] =</a>
+<a class="sourceLine" id="cb3-5" title="5">      <span class="kw">new</span> Monoid[F[A]] {</a>
+<a class="sourceLine" id="cb3-6" title="6">        <span class="kw">override</span> <span class="kw">def</span> empty: F[A] =</a>
+<a class="sourceLine" id="cb3-7" title="7">          F.<span class="fu">pure</span>(M.<span class="fu">empty</span>)</a>
+<a class="sourceLine" id="cb3-8" title="8">        <span class="kw">override</span> <span class="kw">def</span> <span class="fu">combine</span>(x: F[A], y: F[A]): F[A] =</a>
+<a class="sourceLine" id="cb3-9" title="9">          F.<span class="fu">map2</span>(x, y)(M.<span class="fu">combine</span>)</a>
+<a class="sourceLine" id="cb3-10" title="10">      }</a></code></pre></div>
+<p>we can now write</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb4-1" title="1">    <span class="kw">val</span> nelMonoid2 = Monoid[NonEmptyList[String]]</a></code></pre></div>
+<p>(Previously you would have had to write <code>Monoid[Option[NonEmptyList[String]]]</code>.)</p>
+<h2 id="promote-monoid-to-applicative">Promote Monoid to Applicative</h2>
+<p>This one is a bit harder, and requires some use of the fabulous <code>Const</code> data type and its phantom type <code>B</code>.</p>
+<p>From Cats,</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb5-1" title="1"><span class="kw">final</span> <span class="kw">case</span> <span class="kw">class</span> Const[A, B](getConst: A)</a>
+<a class="sourceLine" id="cb5-2" title="2"></a>
+<a class="sourceLine" id="cb5-3" title="3"><span class="kw">sealed</span> <span class="kw">private</span>[data] <span class="kw">trait</span> ConstApplicative[C] </a>
+<a class="sourceLine" id="cb5-4" title="4">  <span class="kw">extends</span> ConstApply[C] <span class="kw">with</span> Applicative[Const[C, *]] {</a>
+<a class="sourceLine" id="cb5-5" title="5"> <span class="kw">implicit</span> <span class="kw">def</span> C0: Monoid[C]</a>
+<a class="sourceLine" id="cb5-6" title="6"></a>
+<a class="sourceLine" id="cb5-7" title="7"> <span class="kw">def</span> pure[A](x: A): Const[C, A] =</a>
+<a class="sourceLine" id="cb5-8" title="8">   Const.<span class="fu">empty</span></a>
+<a class="sourceLine" id="cb5-9" title="9"></a>
+<a class="sourceLine" id="cb5-10" title="10"> <span class="kw">def</span> ap[A, B](f: Const[C, A =&gt; B])(fa: Const[C, A]): Const[C, B] =</a>
+<a class="sourceLine" id="cb5-11" title="11">   f.<span class="fu">retag</span>[B].<span class="fu">combine</span>(fa.<span class="fu">retag</span>[B])	<span class="co">// retag means cast</span></a>
+<a class="sourceLine" id="cb5-12" title="12">}</a></code></pre></div>
+<p>This <code>Applicative</code> instance is lawful, but does look a bit useless. Its <code>pure</code> function ignores its parameter <code>x</code>, and uses Const(C.empty) via the implicit Monoid[C]. And <code>ap</code> ignores the lifted function <code>A =&gt; B</code> altogether!</p>
+<p>But, unlikely as it seems, this <code>Applicative</code> instance is useful, as shown in the next article.</p>
+
+        </div>
+        <div id="footer">
+            Site created with <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+    </body>
+</html>

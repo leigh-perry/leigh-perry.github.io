@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>Sesquipedalia - Inductive Monoids</title>
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="alternate" type="application/rss+xml" title="Sesquipedalia" href="../feed.xml">
+        <link rel="alternate" type="application/atom+xml" title="Sesquipedalia" href="../atom.xml">
+        <link rel="shortcut icon" href="../site/favicon.ico">
+    </head>
+    <body>
+        <div id="header">
+            <div id="logo">
+                <a href="../">Sesquipedalia</a>
+            </div>
+            <div id="navigation">
+                <a href="../index.html">Home</a>
+                <a href="../about.html">About</a>
+                <a href="../contact.html">Contact</a>
+                <a href="../archive.html">Archive</a>
+            </div>
+        </div>
+
+        <div id="content">
+            <h1>Inductive Monoids</h1>
+
+            <div class="info">
+    Posted on November 11, 2019
+    
+</div>
+
+<p>In <a href="https://leigh-perry.github.io/posts/2019-10-25-monoids-1.html">this article</a> I talked about how monoids support multiple aggregations via <em>product composition</em>.</p>
+<p>Well, they also compose in other ways.</p>
+<h1 id="inductive-composition-of-semigroup">Inductive composition of Semigroup</h1>
+<p>Some data structures have a <code>Semigroup</code> instance but are unable to support a <code>Monoid</code>. The canonical example of this is <code>NonEmptyList</code>. There is no natural <code>empty</code> value for <code>NonEmptyList</code>, by, well, by definition.</p>
+<p>However, since <code>NonEmptyList</code> has a <code>Semigroup</code> instance, it is possible to create a <code>Monoid[Option[NonEmptyList]]</code> via the general inductive instance.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb1-1" title="1"><span class="kw">class</span> OptionMonoid[A](<span class="kw">implicit</span> A: Semigroup[A]) <span class="kw">extends</span> Monoid[Option[A]] {</a>
+<a class="sourceLine" id="cb1-2" title="2">  <span class="kw">def</span> empty: Option[A] = None</a>
+<a class="sourceLine" id="cb1-3" title="3">  <span class="kw">def</span> <span class="fu">combine</span>(x: Option[A], y: Option[A]): Option[A] =</a>
+<a class="sourceLine" id="cb1-4" title="4">    x <span class="kw">match</span> {</a>
+<a class="sourceLine" id="cb1-5" title="5">      <span class="kw">case</span> None =&gt; y</a>
+<a class="sourceLine" id="cb1-6" title="6">      <span class="kw">case</span> Some(a) =&gt;</a>
+<a class="sourceLine" id="cb1-7" title="7">        y <span class="kw">match</span> {</a>
+<a class="sourceLine" id="cb1-8" title="8">          <span class="kw">case</span> None    =&gt; x</a>
+<a class="sourceLine" id="cb1-9" title="9">          <span class="kw">case</span> Some(b) =&gt; Some(A.<span class="fu">combine</span>(a, b))</a>
+<a class="sourceLine" id="cb1-10" title="10">        }</a>
+<a class="sourceLine" id="cb1-11" title="11">    }</a>
+<a class="sourceLine" id="cb1-12" title="12">}</a></code></pre></div>
+<p>The inductively manufactured <code>Monoid[Option[A]]</code> uses <code>None</code> to represent <code>empty</code>, and relies on the <code>Semigroup</code> <code>combine</code> inside <code>Some</code> values in order to do implement the composite <code>combine</code>.</p>
+<h2 id="think-of-it-like-this">Think of it like this</h2>
+<p>A <code>List</code> can be thought of as an optional <code>NonEmptyList</code>. Therefore it seems intuitively reasonable that there should exist a <code>Monoid</code> instance for <code>Option[NonEmptyList]</code>.</p>
+
+        </div>
+        <div id="footer">
+            Site created with <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+    </body>
+</html>

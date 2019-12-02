@@ -7,37 +7,45 @@
         <description><![CDATA[Ephema is a software engineering blog by Leigh Perry]]></description>
         <atom:link href="https://leigh-perry.github.io/feed.xml" rel="self"
                    type="application/rss+xml" />
-        <lastBuildDate>Sat, 16 Nov 2019 00:00:00 UT</lastBuildDate>
+        <lastBuildDate>Wed, 20 Nov 2019 00:00:00 UT</lastBuildDate>
         <item>
     <title>Applicatives and Monoids</title>
-    <link>https://leigh-perry.github.io/posts/2019-11-16-monoids-4.html</link>
+    <link>https://leigh-perry.github.io/posts/2019-11-20-monoids-viatraverse.html</link>
+    <description><![CDATA[Another post from Leigh]]></description>
+    <pubDate>Wed, 20 Nov 2019 00:00:00 UT</pubDate>
+    <guid>https://leigh-perry.github.io/posts/2019-11-20-monoids-viatraverse.html</guid>
+    <dc:creator>Leigh Perry</dc:creator>
+</item>
+<item>
+    <title>Applicatives and Monoids</title>
+    <link>https://leigh-perry.github.io/posts/2019-11-16-monoids-applicative.html</link>
     <description><![CDATA[Another post from Leigh]]></description>
     <pubDate>Sat, 16 Nov 2019 00:00:00 UT</pubDate>
-    <guid>https://leigh-perry.github.io/posts/2019-11-16-monoids-4.html</guid>
+    <guid>https://leigh-perry.github.io/posts/2019-11-16-monoids-applicative.html</guid>
     <dc:creator>Leigh Perry</dc:creator>
 </item>
 <item>
     <title>Function Monoids</title>
-    <link>https://leigh-perry.github.io/posts/2019-11-13-monoids-3.html</link>
+    <link>https://leigh-perry.github.io/posts/2019-11-13-monoids-function.html</link>
     <description><![CDATA[Another post from Leigh]]></description>
     <pubDate>Wed, 13 Nov 2019 00:00:00 UT</pubDate>
-    <guid>https://leigh-perry.github.io/posts/2019-11-13-monoids-3.html</guid>
+    <guid>https://leigh-perry.github.io/posts/2019-11-13-monoids-function.html</guid>
     <dc:creator>Leigh Perry</dc:creator>
 </item>
 <item>
     <title>Inductive Monoids</title>
-    <link>https://leigh-perry.github.io/posts/2019-11-11-monoids-2.html</link>
+    <link>https://leigh-perry.github.io/posts/2019-11-11-monoids-induction.html</link>
     <description><![CDATA[Another post from Leigh]]></description>
     <pubDate>Mon, 11 Nov 2019 00:00:00 UT</pubDate>
-    <guid>https://leigh-perry.github.io/posts/2019-11-11-monoids-2.html</guid>
+    <guid>https://leigh-perry.github.io/posts/2019-11-11-monoids-induction.html</guid>
     <dc:creator>Leigh Perry</dc:creator>
 </item>
 <item>
     <title>Monoids for single pass aggregations</title>
-    <link>https://leigh-perry.github.io/posts/2019-10-25-monoids-1.html</link>
+    <link>https://leigh-perry.github.io/posts/2019-10-25-monoids-singlepass.html</link>
     <description><![CDATA[Another post from Leigh]]></description>
     <pubDate>Fri, 25 Oct 2019 00:00:00 UT</pubDate>
-    <guid>https://leigh-perry.github.io/posts/2019-10-25-monoids-1.html</guid>
+    <guid>https://leigh-perry.github.io/posts/2019-10-25-monoids-singlepass.html</guid>
     <dc:creator>Leigh Perry</dc:creator>
 </item>
 <item>
@@ -78,14 +86,6 @@
     <description><![CDATA[Another post from Leigh]]></description>
     <pubDate>Mon, 01 Apr 2019 00:00:00 UT</pubDate>
     <guid>https://leigh-perry.github.io/posts/2019-04-01-fix-haskell-function.html</guid>
-    <dc:creator>Leigh Perry</dc:creator>
-</item>
-<item>
-    <title>Getting started with Haskell tooling</title>
-    <link>https://leigh-perry.github.io/posts/2019-03-01-haskell-tool-start.html</link>
-    <description><![CDATA[Another post from Leigh]]></description>
-    <pubDate>Fri, 01 Mar 2019 00:00:00 UT</pubDate>
-    <guid>https://leigh-perry.github.io/posts/2019-03-01-haskell-tool-start.html</guid>
     <dc:creator>Leigh Perry</dc:creator>
 </item>
 

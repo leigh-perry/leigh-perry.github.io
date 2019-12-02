@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>Sesquipedalia - Monoids for single pass aggregations</title>
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="alternate" type="application/rss+xml" title="Sesquipedalia" href="../feed.xml">
+        <link rel="alternate" type="application/atom+xml" title="Sesquipedalia" href="../atom.xml">
+        <link rel="shortcut icon" href="../site/favicon.ico">
+    </head>
+    <body>
+        <div id="header">
+            <div id="logo">
+                <a href="../">Sesquipedalia</a>
+            </div>
+            <div id="navigation">
+                <a href="../index.html">Home</a>
+                <a href="../about.html">About</a>
+                <a href="../contact.html">Contact</a>
+                <a href="../archive.html">Archive</a>
+            </div>
+        </div>
+
+        <div id="content">
+            <h1>Monoids for single pass aggregations</h1>
+
+            <div class="info">
+    Posted on October 25, 2019
+    
+</div>
+
+<p>Monoids are awesome. They let you perform an aggregation across some kind of collection (actually across an <em>effect</em>). But even better, they let you perform multiple aggregations at the same time in one pass.</p>
+<h1 id="background">Background</h1>
+<p>In Scala, the <code>Monoid</code> typeclass has the following interface.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb1-1" title="1"><span class="kw">trait</span> Semigroup[A] {</a>
+<a class="sourceLine" id="cb1-2" title="2">  <span class="kw">def</span> <span class="fu">combine</span>(x: A, y: A): A  <span class="co">// |+|</span></a>
+<a class="sourceLine" id="cb1-3" title="3">}</a>
+<a class="sourceLine" id="cb1-4" title="4"></a>
+<a class="sourceLine" id="cb1-5" title="5"><span class="kw">trait</span> Monoid[A] <span class="kw">extends</span> Semigroup[A] {</a>
+<a class="sourceLine" id="cb1-6" title="6">  <span class="kw">def</span> empty: A</a>
+<a class="sourceLine" id="cb1-7" title="7">}</a></code></pre></div>
+<p>They are primarily used via the <code>Foldable</code> typeclass abstraction.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb2-1" title="1"><span class="kw">trait</span> Foldable[F[_]] {</a>
+<a class="sourceLine" id="cb2-2" title="2">  <span class="kw">def</span> fold[A](fa: F[A])(<span class="kw">implicit</span> A: Monoid[A]): A</a>
+<a class="sourceLine" id="cb2-3" title="3"></a>
+<a class="sourceLine" id="cb2-4" title="4">  <span class="kw">def</span> foldMap[A, B](fa: F[A])(f: A =&gt; B)(<span class="kw">implicit</span> B: Monoid[B]): B</a>
+<a class="sourceLine" id="cb2-5" title="5">}</a></code></pre></div>
+<h1 id="foldmap">foldMap</h1>
+<p>The <code>foldMap</code> method provides map-reduce functionality. For each element in the <code>Foldable</code>, it maps the element via function <code>f</code>, and then combines all the mapped values using the implicit <code>Monoid[B]</code>. For example</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb3-1" title="1">    <span class="kw">val</span> phrases =</a>
+<a class="sourceLine" id="cb3-2" title="2">      List(<span class="st">&quot;Some&quot;</span>, <span class="st">&quot;Phrases&quot;</span>, <span class="st">&quot;My hovercraft is full of eels&quot;</span>, </a>
+<a class="sourceLine" id="cb3-3" title="3">        <span class="st">&quot;I am no longer infected&quot;</span>, <span class="st">&quot;A&quot;</span>, <span class="st">&quot;I&quot;</span>, <span class="st">&quot;A&quot;</span>, <span class="st">&quot;I&quot;</span>)</a>
+<a class="sourceLine" id="cb3-4" title="4"></a>
+<a class="sourceLine" id="cb3-5" title="5">    <span class="kw">val</span> chars = phrases.<span class="fu">foldMap</span>(_.<span class="fu">length</span>)</a>
+<a class="sourceLine" id="cb3-6" title="6">    <span class="fu">println</span>(chars)</a></code></pre></div>
+<p>prints</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" title="1"><span class="ex">67</span></a></code></pre></div>
+<p>This code folds over some phrases from every day life, maps each to its length, then sums up those lengths. This is implicitly using the <code>Monoid</code> instance for <code>Int</code> (the length of a string).</p>
+<h2 id="monoid-for-int">Monoid for Int</h2>
+<p>In Cats, the <code>Monoid[Int]</code> instance is implemented as</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb5-1" title="1"><span class="kw">class</span> IntGroup <span class="kw">extends</span> CommutativeGroup[Int] {</a>
+<a class="sourceLine" id="cb5-2" title="2">  <span class="kw">def</span> <span class="fu">combine</span>(x: Int, y: Int): Int = x + y</a>
+<a class="sourceLine" id="cb5-3" title="3">  <span class="kw">def</span> empty: Int = <span class="dv">0</span></a>
+<a class="sourceLine" id="cb5-4" title="4">  :</a>
+<a class="sourceLine" id="cb5-5" title="5">}</a></code></pre></div>
+<p>The <code>empty</code> value is 0, and <code>Semigroup</code>’s <code>combine</code> functionality is to just add values. This is not the only possible implementation. It is just as valid to multiply values, in which case the empty value would be <code>1</code>. Because of this ambiguity, Haskell does not provide a <code>Monoid Int</code> instance. Instead you need to use a newtype over Int, for example <code>Sum</code> or <code>Product</code>, making your intentions clear. Cats seems to have erred on the side of ease of use, but you do have to know what it does under the covers.</p>
+<h1 id="multiple-aggregations">Multiple aggregations</h1>
+<p>Anyway, back to the main point.</p>
+<p>Monoids compose in a number of ways, including by product. This means that, if I have a <code>Monoid</code> for types <code>A</code> and <code>B</code>, I can form a <code>Monoid</code> for <code>(A, B)</code>. Similarly, if I also have a <code>Monoid</code> for type <code>C</code>, I can form a <code>Monoid</code> for <code>(A, B, C)</code>. Etc.</p>
+<p>Therefore, if I foldMap via a tuple of required aggregations, such as</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb6-1" title="1">    <span class="kw">val</span> (phrases, chars) = phrases.<span class="fu">foldMap</span>(s =&gt; (<span class="dv">1</span>, s.<span class="fu">length</span>))</a>
+<a class="sourceLine" id="cb6-2" title="2">    <span class="fu">println</span>(phrases)</a>
+<a class="sourceLine" id="cb6-3" title="3">    <span class="fu">println</span>(chars)</a></code></pre></div>
+<p>the composite for <code>Monoid[Int, Int]</code> will yield two aggregated results <code>8</code> and <code>67</code>.</p>
+<p>And it does it in a single pass.</p>
+
+        </div>
+        <div id="footer">
+            Site created with <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+    </body>
+</html>
