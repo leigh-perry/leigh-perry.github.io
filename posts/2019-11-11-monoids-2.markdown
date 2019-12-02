@@ -1,5 +1,5 @@
 ---
-title: Inductive monoids 
+title: Inductive Monoids 
 ---
 
 In [this article](https://leigh-perry.github.io/posts/2019-10-25-monoids-1.html)
