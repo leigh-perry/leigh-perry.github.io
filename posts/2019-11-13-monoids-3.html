@@ -64,17 +64,17 @@
 <p>Note: this code would ideally be written using <code>Foldable.fold</code>, ie <code>int2IntFunctions.foldMap</code>, but <code>List</code> has a <code>fold</code> method that doesn’t know about monoids. Instead, <code>int2IntFunctions.foldMap(identity)</code> is equivalent to <code>int2IntFunctions.fold</code>.</p>
 </blockquote>
 <p>Output is</p>
-<pre><code>0 =&gt; 6
-1 =&gt; 13
-2 =&gt; 22
-3 =&gt; 33
-4 =&gt; 46
-5 =&gt; 61
-6 =&gt; 78
-7 =&gt; 97
-8 =&gt; 118
-9 =&gt; 141
-10 =&gt; 166</code></pre>
+<div class="sourceCode" id="cb3"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb3-1" title="1">    <span class="dv">0</span> =&gt; <span class="dv">6</span></a>
+<a class="sourceLine" id="cb3-2" title="2">    <span class="dv">1</span> =&gt; <span class="dv">13</span></a>
+<a class="sourceLine" id="cb3-3" title="3">    <span class="dv">2</span> =&gt; <span class="dv">22</span></a>
+<a class="sourceLine" id="cb3-4" title="4">    <span class="dv">3</span> =&gt; <span class="dv">33</span></a>
+<a class="sourceLine" id="cb3-5" title="5">    <span class="dv">4</span> =&gt; <span class="dv">46</span></a>
+<a class="sourceLine" id="cb3-6" title="6">    <span class="dv">5</span> =&gt; <span class="dv">61</span></a>
+<a class="sourceLine" id="cb3-7" title="7">    <span class="dv">6</span> =&gt; <span class="dv">78</span></a>
+<a class="sourceLine" id="cb3-8" title="8">    <span class="dv">7</span> =&gt; <span class="dv">97</span></a>
+<a class="sourceLine" id="cb3-9" title="9">    <span class="dv">8</span> =&gt; <span class="dv">118</span></a>
+<a class="sourceLine" id="cb3-10" title="10">    <span class="dv">9</span> =&gt; <span class="dv">141</span></a>
+<a class="sourceLine" id="cb3-11" title="11">    <span class="dv">10</span> =&gt; <span class="dv">166</span></a></code></pre></div>
 <p>The function monoid combines the three functions in <code>int2IntFunctions</code>, and returning a function that will apply each of those functions in turn to an input value, and combine the three outputs using <code>Monoid[Int]</code>, which sums them. For example, value <code>4</code> yields <code>16 + 20 + 10</code>, ie <code>46</code>.</p>
 <h1 id="example-variant">Example variant</h1>
 <p>This time, each function maps to a <code>Max</code> rather than <code>Int</code>. <code>Monoid[Max]</code> accumulates the maximum value, and is defined as</p>
@@ -99,17 +99,17 @@
 <a class="sourceLine" id="cb5-11" title="11">      <span class="fu">println</span>(s<span class="st">&quot;$i =&gt; ${best}&quot;</span>)</a>
 <a class="sourceLine" id="cb5-12" title="12">  }</a></code></pre></div>
 <p>yields</p>
-<pre><code>0 =&gt; Max(6)
-1 =&gt; Max(7)
-2 =&gt; Max(10)
-3 =&gt; Max(15)
-4 =&gt; Max(20)
-5 =&gt; Max(25)
-6 =&gt; Max(36)
-7 =&gt; Max(49)
-8 =&gt; Max(64)
-9 =&gt; Max(81)
-10 =&gt; Max(100)</code></pre>
+<div class="sourceCode" id="cb6"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb6-1" title="1">    <span class="dv">0</span> =&gt; <span class="fu">Max</span>(<span class="dv">6</span>)</a>
+<a class="sourceLine" id="cb6-2" title="2">    <span class="dv">1</span> =&gt; <span class="fu">Max</span>(<span class="dv">7</span>)</a>
+<a class="sourceLine" id="cb6-3" title="3">    <span class="dv">2</span> =&gt; <span class="fu">Max</span>(<span class="dv">10</span>)</a>
+<a class="sourceLine" id="cb6-4" title="4">    <span class="dv">3</span> =&gt; <span class="fu">Max</span>(<span class="dv">15</span>)</a>
+<a class="sourceLine" id="cb6-5" title="5">    <span class="dv">4</span> =&gt; <span class="fu">Max</span>(<span class="dv">20</span>)</a>
+<a class="sourceLine" id="cb6-6" title="6">    <span class="dv">5</span> =&gt; <span class="fu">Max</span>(<span class="dv">25</span>)</a>
+<a class="sourceLine" id="cb6-7" title="7">    <span class="dv">6</span> =&gt; <span class="fu">Max</span>(<span class="dv">36</span>)</a>
+<a class="sourceLine" id="cb6-8" title="8">    <span class="dv">7</span> =&gt; <span class="fu">Max</span>(<span class="dv">49</span>)</a>
+<a class="sourceLine" id="cb6-9" title="9">    <span class="dv">8</span> =&gt; <span class="fu">Max</span>(<span class="dv">64</span>)</a>
+<a class="sourceLine" id="cb6-10" title="10">    <span class="dv">9</span> =&gt; <span class="fu">Max</span>(<span class="dv">81</span>)</a>
+<a class="sourceLine" id="cb6-11" title="11">    <span class="dv">10</span> =&gt; <span class="fu">Max</span>(<span class="dv">100</span>)</a></code></pre></div>
 <p>Behaviour is similar to the previous, however, this time the monoid just selects the largest value returned by any of the functions. From input <code>0</code> to <code>1</code>, the equation <code>i + 6</code> dominates. From <code>2</code> to <code>5</code>, <code>i * 5</code> takes over. Finally, from <code>6</code> onwards, <code>i * i</code> wins.</p>
 <h1 id="uses">Uses</h1>
 <p>This kind of behaviour can be used to check a collection of predicates, accumulating their boolean results using a <code>AllTrue</code> or <code>AnyTrue</code> monoid. (These are called <code>All</code> and <code>Any</code> in Haskell).</p>
