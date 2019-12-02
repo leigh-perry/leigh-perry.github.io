@@ -10,7 +10,7 @@
     </author>
     <updated>2019-11-11T00:00:00Z</updated>
     <entry>
-    <title>Monoids for single pass aggregations</title>
+    <title>Inductive monoids</title>
     <link href="https://leigh-perry.github.io/posts/2019-11-11-monoids-2.html" />
     <id>https://leigh-perry.github.io/posts/2019-11-11-monoids-2.html</id>
     <published>2019-11-11T00:00:00Z</published>
