@@ -19,14 +19,6 @@
 </entry>
 <entry>
     <title>Monoids for single pass aggregations</title>
-    <link href="https://leigh-perry.github.io/posts/2019-10-28-monoids-2.html" />
-    <id>https://leigh-perry.github.io/posts/2019-10-28-monoids-2.html</id>
-    <published>2019-10-28T00:00:00Z</published>
-    <updated>2019-10-28T00:00:00Z</updated>
-    <summary type="html"><![CDATA[Another post from Leigh]]></summary>
-</entry>
-<entry>
-    <title>Monoids for single pass aggregations</title>
     <link href="https://leigh-perry.github.io/posts/2019-10-25-monoids-1.html" />
     <id>https://leigh-perry.github.io/posts/2019-10-25-monoids-1.html</id>
     <published>2019-10-25T00:00:00Z</published>
@@ -87,6 +79,14 @@
     <id>https://leigh-perry.github.io/posts/2018-11-23-generating-functions.html</id>
     <published>2018-11-23T00:00:00Z</published>
     <updated>2018-11-23T00:00:00Z</updated>
+    <summary type="html"><![CDATA[Another post from Leigh]]></summary>
+</entry>
+<entry>
+    <title>The mystery of Applicative's <*> operator (ap)</title>
+    <link href="https://leigh-perry.github.io/posts/2018-07-14-applicative-ap.html" />
+    <id>https://leigh-perry.github.io/posts/2018-07-14-applicative-ap.html</id>
+    <published>2018-07-14T00:00:00Z</published>
+    <updated>2018-07-14T00:00:00Z</updated>
     <summary type="html"><![CDATA[Another post from Leigh]]></summary>
 </entry>
 
