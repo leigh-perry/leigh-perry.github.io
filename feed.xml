@@ -17,6 +17,14 @@
     <dc:creator>Leigh Perry</dc:creator>
 </item>
 <item>
+    <title>Function Monoids</title>
+    <link>https://leigh-perry.github.io/posts/2019-11-13-monoids-3.html</link>
+    <description><![CDATA[Another post from Leigh]]></description>
+    <pubDate>Wed, 13 Nov 2019 00:00:00 UT</pubDate>
+    <guid>https://leigh-perry.github.io/posts/2019-11-13-monoids-3.html</guid>
+    <dc:creator>Leigh Perry</dc:creator>
+</item>
+<item>
     <title>Inductive Monoids</title>
     <link>https://leigh-perry.github.io/posts/2019-11-11-monoids-2.html</link>
     <description><![CDATA[Another post from Leigh]]></description>
@@ -78,14 +86,6 @@
     <description><![CDATA[Another post from Leigh]]></description>
     <pubDate>Fri, 01 Mar 2019 00:00:00 UT</pubDate>
     <guid>https://leigh-perry.github.io/posts/2019-03-01-haskell-tool-start.html</guid>
-    <dc:creator>Leigh Perry</dc:creator>
-</item>
-<item>
-    <title>Generating functions in Scalacheck</title>
-    <link>https://leigh-perry.github.io/posts/2018-11-23-generating-functions.html</link>
-    <description><![CDATA[Another post from Leigh]]></description>
-    <pubDate>Fri, 23 Nov 2018 00:00:00 UT</pubDate>
-    <guid>https://leigh-perry.github.io/posts/2018-11-23-generating-functions.html</guid>
     <dc:creator>Leigh Perry</dc:creator>
 </item>
 

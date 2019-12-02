@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>Sesquipedalia - Function Monoids</title>
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="alternate" type="application/rss+xml" title="Sesquipedalia" href="../feed.xml">
+        <link rel="alternate" type="application/atom+xml" title="Sesquipedalia" href="../atom.xml">
+        <link rel="shortcut icon" href="../site/favicon.ico">
+    </head>
+    <body>
+        <div id="header">
+            <div id="logo">
+                <a href="../">Sesquipedalia</a>
+            </div>
+            <div id="navigation">
+                <a href="../index.html">Home</a>
+                <a href="../about.html">About</a>
+                <a href="../contact.html">Contact</a>
+                <a href="../archive.html">Archive</a>
+            </div>
+        </div>
+
+        <div id="content">
+            <h1>Function Monoids</h1>
+
+            <div class="info">
+    Posted on November 13, 2019
+    
+</div>
+
+<p>In <a href="https://leigh-perry.github.io/posts/2019-10-25-monoids-1.html">this article</a> I talked about how tuple monoids.</p>
+<p>This time it is monoids for functions.</p>
+<h1 id="inductive-monoid-for-functions">Inductive Monoid for functions</h1>
+<p>If a type <code>B</code> has a <code>Monoid</code> instance, then so does any function <code>A =&gt; B</code>. When combining, the <code>Semigroup</code> instance gathers the output of two functions and combines the values using the underlying <code>Monoid[B]</code>.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb1-1" title="1"><span class="kw">trait</span> Function1Semigroup[A, B] <span class="kw">extends</span> Semigroup[A =&gt; B] {</a>
+<a class="sourceLine" id="cb1-2" title="2"> <span class="kw">implicit</span> <span class="kw">def</span> B: Semigroup[B]</a>
+<a class="sourceLine" id="cb1-3" title="3"></a>
+<a class="sourceLine" id="cb1-4" title="4"> <span class="kw">override</span> <span class="kw">def</span> <span class="fu">combine</span>(x: A =&gt; B, y: A =&gt; B): A =&gt; B =</a>
+<a class="sourceLine" id="cb1-5" title="5">   (a: A) =&gt; B.<span class="fu">combine</span>(<span class="fu">x</span>(a), <span class="fu">y</span>(a))</a>
+<a class="sourceLine" id="cb1-6" title="6">}</a>
+<a class="sourceLine" id="cb1-7" title="7"></a>
+<a class="sourceLine" id="cb1-8" title="8"><span class="kw">trait</span> Function1Monoid[A, B]</a>
+<a class="sourceLine" id="cb1-9" title="9">  <span class="kw">extends</span> Function1Semigroup[A, B] <span class="kw">with</span> Monoid[A =&gt; B] {</a>
+<a class="sourceLine" id="cb1-10" title="10"> <span class="kw">implicit</span> <span class="kw">def</span> B: Monoid[B]</a>
+<a class="sourceLine" id="cb1-11" title="11"></a>
+<a class="sourceLine" id="cb1-12" title="12"> <span class="kw">val</span> empty: A =&gt; B =</a>
+<a class="sourceLine" id="cb1-13" title="13">   (_: A) =&gt; B.<span class="fu">empty</span></a>
+<a class="sourceLine" id="cb1-14" title="14">}</a></code></pre></div>
+<h1 id="example">Example</h1>
+<div class="sourceCode" id="cb2"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb2-1" title="1">  <span class="kw">val</span> int2IntFunctions: List[Int =&gt; Int] =</a>
+<a class="sourceLine" id="cb2-2" title="2">    List(</a>
+<a class="sourceLine" id="cb2-3" title="3">      (i: Int) =&gt; i * i,</a>
+<a class="sourceLine" id="cb2-4" title="4">      (i: Int) =&gt; i * <span class="dv">5</span>,</a>
+<a class="sourceLine" id="cb2-5" title="5">      (i: Int) =&gt; i + <span class="dv">6</span></a>
+<a class="sourceLine" id="cb2-6" title="6">    )</a>
+<a class="sourceLine" id="cb2-7" title="7">  (<span class="dv">0</span> to <span class="dv">10</span>).<span class="fu">foreach</span> {</a>
+<a class="sourceLine" id="cb2-8" title="8">    i =&gt;</a>
+<a class="sourceLine" id="cb2-9" title="9">      <span class="kw">val</span> total: Int =&gt; Int = int2IntFunctions.<span class="fu">foldMap</span>(identity)</a>
+<a class="sourceLine" id="cb2-10" title="10">      <span class="fu">println</span>(s<span class="st">&quot;$i =&gt; ${total(i)}&quot;</span>)</a>
+<a class="sourceLine" id="cb2-11" title="11">  }</a></code></pre></div>
+<blockquote>
+<p>Note: this code would ideally be written using <code>Foldable.fold</code>, ie <code>int2IntFunctions.foldMap</code>, but <code>List</code> has a <code>fold</code> method that doesn’t know about monoids. Instead, <code>int2IntFunctions.foldMap(identity)</code> is equivalent to <code>int2IntFunctions.fold</code>.</p>
+</blockquote>
+<p>Output is</p>
+<pre><code>0 =&gt; 6
+1 =&gt; 13
+2 =&gt; 22
+3 =&gt; 33
+4 =&gt; 46
+5 =&gt; 61
+6 =&gt; 78
+7 =&gt; 97
+8 =&gt; 118
+9 =&gt; 141
+10 =&gt; 166</code></pre>
+<p>The function monoid combines the three functions in <code>int2IntFunctions</code>, and returning a function that will apply each of those functions in turn to an input value, and combine the three outputs using <code>Monoid[Int]</code>, which sums them. For example, value <code>4</code> yields <code>16 + 20 + 10</code>, ie <code>46</code>.</p>
+<h1 id="example-variant">Example variant</h1>
+<p>This time, each function maps to a <code>Max</code> rather than <code>Int</code>. <code>Monoid[Max]</code> accumulates the maximum value, and is defined as</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb4-1" title="1">  <span class="kw">final</span> <span class="kw">case</span> <span class="kw">class</span> <span class="fu">Max</span>(i: Int) <span class="kw">extends</span> AnyVal</a>
+<a class="sourceLine" id="cb4-2" title="2"></a>
+<a class="sourceLine" id="cb4-3" title="3">  <span class="kw">implicit</span> <span class="kw">val</span> intMaxMonoid =</a>
+<a class="sourceLine" id="cb4-4" title="4">    <span class="kw">new</span> Monoid[Max] {</a>
+<a class="sourceLine" id="cb4-5" title="5">      <span class="kw">override</span> <span class="kw">def</span> empty: Max = <span class="fu">Max</span>(Int.<span class="fu">MinValue</span>)</a>
+<a class="sourceLine" id="cb4-6" title="6">      <span class="kw">override</span> <span class="kw">def</span> <span class="fu">combine</span>(x: Max, y: Max): Max = <span class="kw">if</span> (x.<span class="fu">i</span> &gt; y.<span class="fu">i</span>) x <span class="kw">else</span> y</a>
+<a class="sourceLine" id="cb4-7" title="7">    }</a></code></pre></div>
+<p>This time</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb5-1" title="1">  <span class="kw">val</span> int2MaxFunctions: List[Int =&gt; Max] =</a>
+<a class="sourceLine" id="cb5-2" title="2">    List(</a>
+<a class="sourceLine" id="cb5-3" title="3">      (i: Int) =&gt; <span class="fu">Max</span>(i * i),</a>
+<a class="sourceLine" id="cb5-4" title="4">      (i: Int) =&gt; <span class="fu">Max</span>(i * <span class="dv">5</span>),</a>
+<a class="sourceLine" id="cb5-5" title="5">      (i: Int) =&gt; <span class="fu">Max</span>(i + <span class="dv">6</span>)</a>
+<a class="sourceLine" id="cb5-6" title="6">    )</a>
+<a class="sourceLine" id="cb5-7" title="7">  (<span class="dv">0</span> to <span class="dv">10</span>).<span class="fu">foreach</span> {</a>
+<a class="sourceLine" id="cb5-8" title="8">    i =&gt;</a>
+<a class="sourceLine" id="cb5-9" title="9">      <span class="kw">val</span> bestf: Int =&gt; Max = int2MaxFunctions.<span class="fu">foldMap</span>(identity)</a>
+<a class="sourceLine" id="cb5-10" title="10">      <span class="kw">val</span> best: Max = <span class="fu">bestf</span>(i)</a>
+<a class="sourceLine" id="cb5-11" title="11">      <span class="fu">println</span>(s<span class="st">&quot;$i =&gt; ${best}&quot;</span>)</a>
+<a class="sourceLine" id="cb5-12" title="12">  }</a></code></pre></div>
+<p>yields</p>
+<pre><code>0 =&gt; Max(6)
+1 =&gt; Max(7)
+2 =&gt; Max(10)
+3 =&gt; Max(15)
+4 =&gt; Max(20)
+5 =&gt; Max(25)
+6 =&gt; Max(36)
+7 =&gt; Max(49)
+8 =&gt; Max(64)
+9 =&gt; Max(81)
+10 =&gt; Max(100)</code></pre>
+<p>Behaviour is similar to the previous, however, this time the monoid just selects the largest value returned by any of the functions. From input <code>0</code> to <code>1</code>, the equation <code>i + 6</code> dominates. From <code>2</code> to <code>5</code>, <code>i * 5</code> takes over. Finally, from <code>6</code> onwards, <code>i * i</code> wins.</p>
+<h1 id="uses">Uses</h1>
+<p>This kind of behaviour can be used to check a collection of predicates, accumulating their boolean results using a <code>AllTrue</code> or <code>AnyTrue</code> monoid. (These are called <code>All</code> and <code>Any</code> in Haskell).</p>
+<blockquote>
+<p>Note: these monoidal predicates do not provide short-circuiting behaviour. They apply all predicates even if the result has already been decided, such as an <code>AllTrue</code> accumulation that has already encountered a <code>false</code>.</p>
+</blockquote>
+<p>Despite the short-circuiting limitation, such monoidal accumulations of functions can provide a simple and expressive way of dynamically configuring application runtime behaviour.</p>
+
+        </div>
+        <div id="footer">
+            Site created with <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+    </body>
+</html>

@@ -50,7 +50,7 @@
 <li>promote any <code>Monoid</code> to an <code>Applicative</code></li>
 </ul>
 <p>How?</p>
-<h2 id="monoid-instance-for-any-applicative"><code>Monoid</code> instance for any <code>Applicative</code></h2>
+<h2 id="monoid-instance-for-any-applicative">Monoid instance for any Applicative</h2>
 <p>This is easy. To create a <code>Monoid[F[A]]</code> where <code>F</code> has an <code>Applicative</code> instance, just wrap the <code>empty</code> value with <code>pure</code>, and use the <code>Applicative</code> combination.</p>
 <p>With this</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb3-1" title="1">    <span class="kw">implicit</span> <span class="kw">def</span> monoidForApplicative[F[_], A](</a>
@@ -66,8 +66,8 @@
 <p>we can now write</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb4-1" title="1">    <span class="kw">val</span> nelMonoid2 = Monoid[NonEmptyList[String]]</a></code></pre></div>
 <p>(Previously you would have had to write <code>Monoid[Option[NonEmptyList[String]]]</code>.)</p>
-<h2 id="promote-monoid-to-applicative">Promote <code>Monoid</code> to <code>Applicative</code></h2>
-<p>This one is a bit harder, and requires some use of the fabulous <code>Const</code> data type.</p>
+<h2 id="promote-monoid-to-applicative">Promote Monoid to Applicative</h2>
+<p>This one is a bit harder, and requires some use of the fabulous <code>Const</code> data type and its phantom type <code>B</code>.</p>
 <p>From Cats,</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb5-1" title="1"><span class="kw">final</span> <span class="kw">case</span> <span class="kw">class</span> Const[A, B](getConst: A)</a>
 <a class="sourceLine" id="cb5-2" title="2"></a>
