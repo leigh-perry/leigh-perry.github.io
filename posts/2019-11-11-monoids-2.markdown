@@ -1,0 +1,40 @@
+---
+title: Monoids for single pass aggregations
+---
+
+In [this article](https://leigh-perry.github.io/posts/2019-10-25-monoids-1.html)
+I talked about how monoids support multiple aggregations via _product composition_.
+
+Well, they also compose in other ways. 
+
+# Inductive composition of Semigroup
+
+Some data structures have a `Semigroup` instance but are unable to support a `Monoid`.
+The canonical example of this is `NonEmptyList`.
+There is no natural `empty` value for `NonEmptyList`, by, well, by definition.
+
+However, since `NonEmptyList` has a `Semigroup` instance, it is possible to 
+create a `Monoid[Option[NonEmptyList]]` via the general inductive instance.
+```scala
+class OptionMonoid[A](implicit A: Semigroup[A]) extends Monoid[Option[A]] {
+  def empty: Option[A] = None
+  def combine(x: Option[A], y: Option[A]): Option[A] =
+    x match {
+      case None => y
+      case Some(a) =>
+        y match {
+          case None    => x
+          case Some(b) => Some(A.combine(a, b))
+        }
+    }
+}
+```
+The inductively manufactured `Monoid[Option[A]]` uses `None` to represent `empty`,
+and relies on the `Semigroup` `combine` inside `Some` values in order to do implement
+the composite `combine`.
+
+## Think of it like this
+
+A `List` can be thought of as an optional `NonEmptyList`.
+Therefore it seems intuitively reasonable that there should exist a `Monoid` instance for
+`Option[NonEmptyList]`.
