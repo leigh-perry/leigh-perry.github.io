@@ -1,5 +1,5 @@
 ---
-title: Monoidal aggregation via Traverse 
+title: Applicatives and Monoids 
 ---
 
 Lukewarm on the heels of my series of [monoidal meditation](https://leigh-perry.github.io/posts/2019-11-13-monoids-function.html),

@@ -1,5 +1,5 @@
 ---
-title: Applicatives and Monoids 
+title: Monoidal aggregation via Traverse 
 ---
 
 [Earlier](https://leigh-perry.github.io/posts/2019-11-16-monoids-applicative.html),
