@@ -36,7 +36,7 @@ It turns out that we can
 
 How?
 
-## `Monoid` instance for any `Applicative`
+## Monoid instance for any Applicative
 
 This is easy. To create a `Monoid[F[A]]` where `F` has an `Applicative` instance,
 just wrap the `empty` value with `pure`, and use the `Applicative` combination.
@@ -60,9 +60,10 @@ we can now write
 ```
 (Previously you would have had to write `Monoid[Option[NonEmptyList[String]]]`.)
 
-## Promote `Monoid` to `Applicative`
+## Promote Monoid to Applicative
 
-This one is a bit harder, and requires some use of the fabulous `Const` data type.
+This one is a bit harder, and requires some use of the fabulous `Const` data type
+and its phantom type `B`.
 
 From Cats,
 ```scala
