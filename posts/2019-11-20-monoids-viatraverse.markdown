@@ -32,10 +32,8 @@ outputs `4 97`.
 
 Depending on whether it is counting lines or characters, 
 this implementation maps each character to `0` or `1`.
-The `Monoid[Int]` instance then adds them up. 
-
-> Ignore the fact that the string may not end in a newline,
-> so line count could be out by one.
+The `Monoid[Int]` instance then adds them up. (Ignore the fact that the string may not end in a newline,
+so line count could be out by one.) 
 
 Implementing the count of words is not so easy, since an implementation needs
 to track transitions from whitespace to non-whitespace.
@@ -45,7 +43,7 @@ It needs state.
 
 Tracking state can be implemented using a custom `Monoid`
 ```scala
-  final case class Counts(lines: Int, inWord: Boolean, words: Int, chars: Int)
+final case class Counts(lines: Int, inWord: Boolean, words: Int, chars: Int)
 
 object Counts {
   implicit val monoidInstance =
@@ -62,16 +60,16 @@ object Counts {
     }
 }
 
-   val counts =
-      chars.foldMap(
-        c =>
-          Counts(
-            lines = if (c == '\n') 1 else 0,
-            inWord = c != ' ' && c != '\n',
-            words = 0,
-            chars = 1
-          )
-      )
+  val counts =
+     chars.foldMap(
+       c =>
+         Counts(
+           lines = if (c == '\n') 1 else 0,
+           inWord = c != ' ' && c != '\n',
+           words = 0,
+           chars = 1
+         )
+     )
 ```
 that tracks whitespace transitions when counting words.
 
@@ -134,7 +132,7 @@ by the wrapped `Monoid[Int`.
 But it works, demonstrating that monoids can be invoked indirectly when wrapped
 by an `Applicative` instance.
 
-> The `traverse_` method is used here since the actual result of the traversal
+> Note: the `traverse_` method is used here since the actual result of the traversal
 > is not used.
 > The full return type would be `Nested[State[Boolean, *], Const[Int, *], List[Unit]]`,
 > and that `List[Unit]` is not very useful.
