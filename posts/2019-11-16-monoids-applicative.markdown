@@ -85,4 +85,6 @@ This `Applicative` instance is lawful, but does look a bit useless.
 Its `pure` function ignores its parameter `x`, and uses Const(C.empty) via the implicit Monoid[C].
 And `ap` ignores the lifted function `A => B` altogether!
 
-But, unlikely as it seems, this `Applicative` instance is useful, as shown in the next article.
+But, unlikely as it seems, this `Applicative` instance is useful, as shown in 
+the [next article](https://leigh-perry.github.io/posts/2019-11-20-monoids-viatraverse.html)
+in the series.
