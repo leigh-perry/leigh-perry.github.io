@@ -47,14 +47,11 @@
 <a class="sourceLine" id="cb1-8" title="8">    <span class="kw">val</span> (ls, cs) = chars.<span class="fu">foldMap</span>(c =&gt; (<span class="kw">if</span> (c == <span class="ch">'\n'</span>) <span class="dv">1</span> <span class="kw">else</span> <span class="dv">0</span>, <span class="dv">1</span>))</a>
 <a class="sourceLine" id="cb1-9" title="9">    <span class="fu">println</span>(s<span class="st">&quot;$ls $cs&quot;</span>)</a></code></pre></div>
 <p>outputs <code>4 97</code>.</p>
-<p>Depending on whether it is counting lines or characters, this implementation maps each character to <code>0</code> or <code>1</code>. The <code>Monoid[Int]</code> instance then adds them up.</p>
-<blockquote>
-<p>Ignore the fact that the string may not end in a newline, so line count could be out by one.</p>
-</blockquote>
+<p>Depending on whether it is counting lines or characters, this implementation maps each character to <code>0</code> or <code>1</code>. The <code>Monoid[Int]</code> instance then adds them up. (Ignore the fact that the string may not end in a newline, so line count could be out by one.)</p>
 <p>Implementing the count of words is not so easy, since an implementation needs to track transitions from whitespace to non-whitespace. It needs state.</p>
 <h2 id="state-via-custom-monoid">State via custom Monoid</h2>
 <p>Tracking state can be implemented using a custom <code>Monoid</code></p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb2-1" title="1">  <span class="kw">final</span> <span class="kw">case</span> <span class="kw">class</span> <span class="fu">Counts</span>(lines: Int, inWord: Boolean, words: Int, chars: Int)</a>
+<div class="sourceCode" id="cb2"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb2-1" title="1"><span class="kw">final</span> <span class="kw">case</span> <span class="kw">class</span> <span class="fu">Counts</span>(lines: Int, inWord: Boolean, words: Int, chars: Int)</a>
 <a class="sourceLine" id="cb2-2" title="2"></a>
 <a class="sourceLine" id="cb2-3" title="3"><span class="kw">object</span> Counts {</a>
 <a class="sourceLine" id="cb2-4" title="4">  <span class="kw">implicit</span> <span class="kw">val</span> monoidInstance =</a>
@@ -71,16 +68,16 @@
 <a class="sourceLine" id="cb2-15" title="15">    }</a>
 <a class="sourceLine" id="cb2-16" title="16">}</a>
 <a class="sourceLine" id="cb2-17" title="17"></a>
-<a class="sourceLine" id="cb2-18" title="18">   <span class="kw">val</span> counts =</a>
-<a class="sourceLine" id="cb2-19" title="19">      chars.<span class="fu">foldMap</span>(</a>
-<a class="sourceLine" id="cb2-20" title="20">        c =&gt;</a>
-<a class="sourceLine" id="cb2-21" title="21">          <span class="fu">Counts</span>(</a>
-<a class="sourceLine" id="cb2-22" title="22">            lines = <span class="kw">if</span> (c == <span class="ch">'\n'</span>) <span class="dv">1</span> <span class="kw">else</span> <span class="dv">0</span>,</a>
-<a class="sourceLine" id="cb2-23" title="23">            inWord = c != <span class="ch">' '</span> &amp;&amp; c != <span class="ch">'\n'</span>,</a>
-<a class="sourceLine" id="cb2-24" title="24">            words = <span class="dv">0</span>,</a>
-<a class="sourceLine" id="cb2-25" title="25">            chars = <span class="dv">1</span></a>
-<a class="sourceLine" id="cb2-26" title="26">          )</a>
-<a class="sourceLine" id="cb2-27" title="27">      )</a></code></pre></div>
+<a class="sourceLine" id="cb2-18" title="18">  <span class="kw">val</span> counts =</a>
+<a class="sourceLine" id="cb2-19" title="19">     chars.<span class="fu">foldMap</span>(</a>
+<a class="sourceLine" id="cb2-20" title="20">       c =&gt;</a>
+<a class="sourceLine" id="cb2-21" title="21">         <span class="fu">Counts</span>(</a>
+<a class="sourceLine" id="cb2-22" title="22">           lines = <span class="kw">if</span> (c == <span class="ch">'\n'</span>) <span class="dv">1</span> <span class="kw">else</span> <span class="dv">0</span>,</a>
+<a class="sourceLine" id="cb2-23" title="23">           inWord = c != <span class="ch">' '</span> &amp;&amp; c != <span class="ch">'\n'</span>,</a>
+<a class="sourceLine" id="cb2-24" title="24">           words = <span class="dv">0</span>,</a>
+<a class="sourceLine" id="cb2-25" title="25">           chars = <span class="dv">1</span></a>
+<a class="sourceLine" id="cb2-26" title="26">         )</a>
+<a class="sourceLine" id="cb2-27" title="27">     )</a></code></pre></div>
 <p>that tracks whitespace transitions when counting words.</p>
 <h2 id="state-via-applicative">State via Applicative</h2>
 <p>An interesting alternative is to lift the accumulating <code>Monoid</code>s into their <code>Const</code>-based <code>Applicative</code> <a href="https://leigh-perry.github.io/posts/2019-11-16-monoids-applicative.html">instance</a>, and use <code>Traverse</code> to control the accumulation.</p>
@@ -117,7 +114,7 @@
 <p>yields <code>16</code>.</p>
 <p>A bit clunky, especially <code>result.value.runA(false).value.getConst</code> to unpeel the <code>Nested</code> then <code>State</code> then <code>Const</code> to get at the underlying value accumulated by the wrapped <code>Monoid[Int</code>. But it works, demonstrating that monoids can be invoked indirectly when wrapped by an <code>Applicative</code> instance.</p>
 <blockquote>
-<p>The <code>traverse_</code> method is used here since the actual result of the traversal is not used. The full return type would be <code>Nested[State[Boolean, *], Const[Int, *], List[Unit]]</code>, and that <code>List[Unit]</code> is not very useful. Instead, <code>traverse_</code> replaces it with <code>Unit</code>.</p>
+<p>Note: the <code>traverse_</code> method is used here since the actual result of the traversal is not used. The full return type would be <code>Nested[State[Boolean, *], Const[Int, *], List[Unit]]</code>, and that <code>List[Unit]</code> is not very useful. Instead, <code>traverse_</code> replaces it with <code>Unit</code>.</p>
 </blockquote>
 <h3 id="putting-it-together">Putting it together</h3>
 <p>In reality, it is a requirement to also accumulate the easy line and character counts. To do this in one pass, we need a composite <code>Applicative</code> that counts lines, words, and characters.</p>
