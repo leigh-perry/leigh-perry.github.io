@@ -82,7 +82,7 @@
 <a class="sourceLine" id="cb5-11" title="11">   f.<span class="fu">retag</span>[B].<span class="fu">combine</span>(fa.<span class="fu">retag</span>[B])	<span class="co">// retag means cast</span></a>
 <a class="sourceLine" id="cb5-12" title="12">}</a></code></pre></div>
 <p>This <code>Applicative</code> instance is lawful, but does look a bit useless. Its <code>pure</code> function ignores its parameter <code>x</code>, and uses Const(C.empty) via the implicit Monoid[C]. And <code>ap</code> ignores the lifted function <code>A =&gt; B</code> altogether!</p>
-<p>But, unlikely as it seems, this <code>Applicative</code> instance is useful, as shown in the next article.</p>
+<p>But, unlikely as it seems, this <code>Applicative</code> instance is useful, as shown in the <a href="https://leigh-perry.github.io/posts/2019-11-20-monoids-viatraverse.html">next article</a> in the series.</p>
 
         </div>
         <div id="footer">
