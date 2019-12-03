@@ -31,7 +31,133 @@
 </div>
 
 <p><a href="https://leigh-perry.github.io/posts/2019-11-16-monoids-applicative.html">Earlier</a>, I talked about the relationship between <code>Applicative</code> and <code>Monoid</code> typeclasses.</p>
-<h1 id="todo">TODO</h1>
+<p>It is time to work out what the <code>Applicative</code> instance for a <code>Monoid</code> is good for.</p>
+<h1 id="real-world-programming">Real world programming</h1>
+<p>For a programming language, it is not enough to be able to just write Hello World. You have to write word count too.</p>
+<p>Let’s do that.</p>
+<h1 id="wc-via-monoid">wc via Monoid</h1>
+<p>Implementing character count and line count are easy, since the accumulations are stateless.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb1-1" title="1">    <span class="kw">val</span> chars: List[Char] =</a>
+<a class="sourceLine" id="cb1-2" title="2">      <span class="st">&quot;&quot;&quot;Tonight's the night</span></a>
+<a class="sourceLine" id="cb1-3" title="3">        |I shall be talking about of flu</a>
+<a class="sourceLine" id="cb1-4" title="4">        |the   subject   of</a>
+<a class="sourceLine" id="cb1-5" title="5">        |word association football</a>
+<a class="sourceLine" id="cb1-6" title="6">        |<span class="st">&quot;&quot;&quot;.stripMargin.toList</span></a>
+<a class="sourceLine" id="cb1-7" title="7">  </a>
+<a class="sourceLine" id="cb1-8" title="8">    <span class="kw">val</span> (ls, cs) = chars.<span class="fu">foldMap</span>(c =&gt; (<span class="kw">if</span> (c == <span class="ch">'\n'</span>) <span class="dv">1</span> <span class="kw">else</span> <span class="dv">0</span>, <span class="dv">1</span>))</a>
+<a class="sourceLine" id="cb1-9" title="9">    <span class="fu">println</span>(s<span class="st">&quot;$ls $cs&quot;</span>)</a></code></pre></div>
+<p>outputs <code>4 97</code>.</p>
+<p>Depending on whether it is counting lines or characters, this implementation maps each character to <code>0</code> or <code>1</code>. The <code>Monoid[Int]</code> instance then adds them up.</p>
+<blockquote>
+<p>Ignore the fact that the string may not end in a newline, so line count could be out by one.</p>
+</blockquote>
+<p>Implementing the count of words is not so easy, since an implementation needs to track transitions from whitespace to non-whitespace. It needs state.</p>
+<h2 id="state-via-custom-monoid">State via custom Monoid</h2>
+<p>Tracking state can be implemented using a custom <code>Monoid</code></p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb2-1" title="1">  <span class="kw">final</span> <span class="kw">case</span> <span class="kw">class</span> <span class="fu">Counts</span>(lines: Int, inWord: Boolean, words: Int, chars: Int)</a>
+<a class="sourceLine" id="cb2-2" title="2"></a>
+<a class="sourceLine" id="cb2-3" title="3"><span class="kw">object</span> Counts {</a>
+<a class="sourceLine" id="cb2-4" title="4">  <span class="kw">implicit</span> <span class="kw">val</span> monoidInstance =</a>
+<a class="sourceLine" id="cb2-5" title="5">    <span class="kw">new</span> Monoid[Counts] {</a>
+<a class="sourceLine" id="cb2-6" title="6">      <span class="kw">override</span> <span class="kw">def</span> empty: Counts =</a>
+<a class="sourceLine" id="cb2-7" title="7">        <span class="fu">Counts</span>(<span class="dv">0</span>, <span class="kw">false</span>, <span class="dv">0</span>, <span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb2-8" title="8">      <span class="kw">override</span> <span class="kw">def</span> <span class="fu">combine</span>(x: Counts, y: Counts): Counts =</a>
+<a class="sourceLine" id="cb2-9" title="9">        <span class="fu">Counts</span>(</a>
+<a class="sourceLine" id="cb2-10" title="10">          x.<span class="fu">lines</span> + y.<span class="fu">lines</span>,</a>
+<a class="sourceLine" id="cb2-11" title="11">          y.<span class="fu">inWord</span>,</a>
+<a class="sourceLine" id="cb2-12" title="12">          x.<span class="fu">words</span> + y.<span class="fu">words</span> + (<span class="kw">if</span> (!x.<span class="fu">inWord</span> &amp;&amp; y.<span class="fu">inWord</span>) <span class="dv">1</span> <span class="kw">else</span> <span class="dv">0</span>),</a>
+<a class="sourceLine" id="cb2-13" title="13">          x.<span class="fu">chars</span> + y.<span class="fu">chars</span></a>
+<a class="sourceLine" id="cb2-14" title="14">        )</a>
+<a class="sourceLine" id="cb2-15" title="15">    }</a>
+<a class="sourceLine" id="cb2-16" title="16">}</a>
+<a class="sourceLine" id="cb2-17" title="17"></a>
+<a class="sourceLine" id="cb2-18" title="18">   <span class="kw">val</span> counts =</a>
+<a class="sourceLine" id="cb2-19" title="19">      chars.<span class="fu">foldMap</span>(</a>
+<a class="sourceLine" id="cb2-20" title="20">        c =&gt;</a>
+<a class="sourceLine" id="cb2-21" title="21">          <span class="fu">Counts</span>(</a>
+<a class="sourceLine" id="cb2-22" title="22">            lines = <span class="kw">if</span> (c == <span class="ch">'\n'</span>) <span class="dv">1</span> <span class="kw">else</span> <span class="dv">0</span>,</a>
+<a class="sourceLine" id="cb2-23" title="23">            inWord = c != <span class="ch">' '</span> &amp;&amp; c != <span class="ch">'\n'</span>,</a>
+<a class="sourceLine" id="cb2-24" title="24">            words = <span class="dv">0</span>,</a>
+<a class="sourceLine" id="cb2-25" title="25">            chars = <span class="dv">1</span></a>
+<a class="sourceLine" id="cb2-26" title="26">          )</a>
+<a class="sourceLine" id="cb2-27" title="27">      )</a></code></pre></div>
+<p>that tracks whitespace transitions when counting words.</p>
+<h2 id="state-via-applicative">State via Applicative</h2>
+<p>An interesting alternative is to lift the accumulating <code>Monoid</code>s into their <code>Const</code>-based <code>Applicative</code> <a href="https://leigh-perry.github.io/posts/2019-11-16-monoids-applicative.html">instance</a>, and use <code>Traverse</code> to control the accumulation.</p>
+<p>This function</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb3-1" title="1">  <span class="kw">def</span> countWords[A](c: Char): Nested[State[Boolean, *], Const[Int, *], A] =</a>
+<a class="sourceLine" id="cb3-2" title="2">    Nested[State[Boolean, *], Const[Int, *], A] {</a>
+<a class="sourceLine" id="cb3-3" title="3">      <span class="co">// F: State[Boolean, *] ; G: Const[Int, *]</span></a>
+<a class="sourceLine" id="cb3-4" title="4">      <span class="kw">for</span> {</a>
+<a class="sourceLine" id="cb3-5" title="5">        before &lt;- State.<span class="fu">get</span>[Boolean]</a>
+<a class="sourceLine" id="cb3-6" title="6">        after = !c.<span class="fu">isWhitespace</span></a>
+<a class="sourceLine" id="cb3-7" title="7">        _ &lt;- State.<span class="fu">set</span>[Boolean](after)</a>
+<a class="sourceLine" id="cb3-8" title="8">      } <span class="kw">yield</span> {</a>
+<a class="sourceLine" id="cb3-9" title="9">        Const.<span class="fu">of</span>[A](<span class="kw">if</span> (!before &amp;&amp; after) <span class="dv">1</span> <span class="kw">else</span> <span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb3-10" title="10">      }</a>
+<a class="sourceLine" id="cb3-11" title="11">    }</a></code></pre></div>
+<p>maps each character to an <code>Applicative</code> instance that uses Cats <code>Nested</code> to wrap a <code>State</code> monad instance. The <code>State</code>’s <em>state</em> tracks whether currently in whitespace (ie <code>Boolean</code>), and its yielded value is <code>Const[Int, *]</code>. This is the integer word count, wrapped in <code>Const</code> in order to provide an <code>Applicative</code> instance. Having a <code>Monad</code> instance, <code>State</code> also by definition has an <code>Applicative</code> instance. <code>Nested</code> is Cats machinery for composing <code>State</code> and <code>Applicative</code> to make a composite <code>Applicative</code>.</p>
+<p>Armed with this word-counting <code>Applicative</code>, typeclass <code>Traverse</code>’s <code>traverse</code> method can be used to apply it to a collection of characters.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb4-1" title="1">    <span class="kw">val</span> result : Nested[State[Boolean, *], Const[Int, *], Unit] =</a>
+<a class="sourceLine" id="cb4-2" title="2">      input.<span class="fu">traverse_</span> {</a>
+<a class="sourceLine" id="cb4-3" title="3">        c =&gt;</a>
+<a class="sourceLine" id="cb4-4" title="4">          countWords[Unit](c)</a>
+<a class="sourceLine" id="cb4-5" title="5">      }</a>
+<a class="sourceLine" id="cb4-6" title="6"></a>
+<a class="sourceLine" id="cb4-7" title="7">    result.<span class="fu">value</span>.<span class="fu">runA</span>(<span class="kw">false</span>).<span class="fu">value</span>.<span class="fu">getConst</span></a>
+<a class="sourceLine" id="cb4-8" title="8"></a>
+<a class="sourceLine" id="cb4-9" title="9">    <span class="kw">val</span> chars: List[Char] =</a>
+<a class="sourceLine" id="cb4-10" title="10">      <span class="st">&quot;&quot;&quot;Tonight's the night</span></a>
+<a class="sourceLine" id="cb4-11" title="11">        |I shall be talking about of flu</a>
+<a class="sourceLine" id="cb4-12" title="12">        |the   subject   of</a>
+<a class="sourceLine" id="cb4-13" title="13">        |word association football</a>
+<a class="sourceLine" id="cb4-14" title="14">        |<span class="st">&quot;&quot;&quot;.stripMargin.toList</span></a>
+<a class="sourceLine" id="cb4-15" title="15">  </a>
+<a class="sourceLine" id="cb4-16" title="16">    <span class="fu">println</span>(<span class="fu">run</span>(chars))</a></code></pre></div>
+<p>yields <code>16</code>.</p>
+<p>A bit clunky, especially <code>result.value.runA(false).value.getConst</code> to unpeel the <code>Nested</code> then <code>State</code> then <code>Const</code> to get at the underlying value accumulated by the wrapped <code>Monoid[Int</code>. But it works, demonstrating that monoids can be invoked indirectly when wrapped by an <code>Applicative</code> instance.</p>
+<blockquote>
+<p>The <code>traverse_</code> method is used here since the actual result of the traversal is not used. The full return type would be <code>Nested[State[Boolean, *], Const[Int, *], List[Unit]]</code>, and that <code>List[Unit]</code> is not very useful. Instead, <code>traverse_</code> replaces it with <code>Unit</code>.</p>
+</blockquote>
+<h3 id="putting-it-together">Putting it together</h3>
+<p>In reality, it is a requirement to also accumulate the easy line and character counts. To do this in one pass, we need a composite <code>Applicative</code> that counts lines, words, and characters.</p>
+<p>This is a mechanical exercise utilising another piece of Cats machinery called <code>Tuple2K</code>. This is a tuple acting at kind <code>* -&gt; *</code>, but the executive summary is that it provides a composite <code>Applicative</code> for a pair of <code>Applicative</code>s. In this case, we need a 3-part tuple. There is no such thing, but it can be emulating by nesting <code>Tuple2K</code>s: <code>Tuple2K[Tuple2K[A, B], C]</code>.</p>
+<p>The full horror, with Scala type inference assistance liberally applied, follows</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb5-1" title="1">    <span class="kw">def</span> countChars[A](c: Char): Const[Int, A] =</a>
+<a class="sourceLine" id="cb5-2" title="2">      Const.<span class="fu">of</span>(<span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb5-3" title="3">  </a>
+<a class="sourceLine" id="cb5-4" title="4">    <span class="kw">def</span> countLines[A](c: Char): Const[Int, A] =</a>
+<a class="sourceLine" id="cb5-5" title="5">      Const.<span class="fu">of</span>[A](<span class="kw">if</span> (c == <span class="ch">'\n'</span>) <span class="dv">1</span> <span class="kw">else</span> <span class="dv">0</span>)</a>
+<a class="sourceLine" id="cb5-6" title="6">  </a>
+<a class="sourceLine" id="cb5-7" title="7">    <span class="kw">def</span> <span class="fu">run</span>(input: List[Char]): (Int, Int, Int) = {</a>
+<a class="sourceLine" id="cb5-8" title="8">      <span class="kw">val</span> <span class="fu">Tuple2K</span>(</a>
+<a class="sourceLine" id="cb5-9" title="9">        <span class="fu">Tuple2K</span>(chars: Const[Int, Unit], lines: Const[Int, Unit]),</a>
+<a class="sourceLine" id="cb5-10" title="10">        words: Nested[State[Boolean, *], Const[Int, *], Unit]</a>
+<a class="sourceLine" id="cb5-11" title="11">      ) =</a>
+<a class="sourceLine" id="cb5-12" title="12">        input.<span class="fu">traverse_</span> {</a>
+<a class="sourceLine" id="cb5-13" title="13">          c =&gt;</a>
+<a class="sourceLine" id="cb5-14" title="14">            <span class="kw">val</span> charsAndLines: Tuple2K[Const[Int, *], Const[Int, *], Unit] =</a>
+<a class="sourceLine" id="cb5-15" title="15">              Tuple2K[Const[Int, *], Const[Int, *], Unit](</a>
+<a class="sourceLine" id="cb5-16" title="16">                countChars[Unit](c),</a>
+<a class="sourceLine" id="cb5-17" title="17">                countLines[Unit](c)</a>
+<a class="sourceLine" id="cb5-18" title="18">              )</a>
+<a class="sourceLine" id="cb5-19" title="19">  </a>
+<a class="sourceLine" id="cb5-20" title="20">            Tuple2K[Tuple2K[Const[Int, *], Const[Int, *], *], Nested[</a>
+<a class="sourceLine" id="cb5-21" title="21">              State[Boolean, *],</a>
+<a class="sourceLine" id="cb5-22" title="22">              Const[Int, *],</a>
+<a class="sourceLine" id="cb5-23" title="23">              *</a>
+<a class="sourceLine" id="cb5-24" title="24">            ], Unit](</a>
+<a class="sourceLine" id="cb5-25" title="25">              charsAndLines,</a>
+<a class="sourceLine" id="cb5-26" title="26">              countWords[Unit](c)</a>
+<a class="sourceLine" id="cb5-27" title="27">            )</a>
+<a class="sourceLine" id="cb5-28" title="28">        }</a>
+<a class="sourceLine" id="cb5-29" title="29">  </a>
+<a class="sourceLine" id="cb5-30" title="30">      (lines.<span class="fu">getConst</span>, words.<span class="fu">value</span>.<span class="fu">runA</span>(<span class="kw">false</span>).<span class="fu">value</span>.<span class="fu">getConst</span>, chars.<span class="fu">getConst</span>)</a>
+<a class="sourceLine" id="cb5-31" title="31">    }</a>
+<a class="sourceLine" id="cb5-32" title="32"></a>
+<a class="sourceLine" id="cb5-33" title="33">    <span class="fu">println</span>(<span class="fu">run</span>(chars))</a></code></pre></div>
+<h1 id="conclusion">Conclusion</h1>
+<p>Would you write word count this way? Probably not. But it does illustrate how a reasonable understanding of typeclass derivation and some lateral thinking can provide alternative solutions, perhaps even a solution where no straightforward approach was feasible.</p>
 
         </div>
         <div id="footer">
