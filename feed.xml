@@ -9,7 +9,7 @@
                    type="application/rss+xml" />
         <lastBuildDate>Sun, 26 Apr 2020 00:00:00 UT</lastBuildDate>
         <item>
-    <title>Controlling magnolia implicit priorities in Scala</title>
+    <title>Controlling Magnolia implicit priorities in Scala</title>
     <link>https://leigh-perry.github.io/posts/2020-04-26-magnolia-implicits.html</link>
     <description><![CDATA[Another post from Leigh]]></description>
     <pubDate>Sun, 26 Apr 2020 00:00:00 UT</pubDate>
