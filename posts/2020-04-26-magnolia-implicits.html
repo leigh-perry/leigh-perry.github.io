@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>Sesquipedalia - Controlling magnolia implicit priorities in Scala</title>
+        <link rel="stylesheet" type="text/css" href="../css/default.css" />
+        <link rel="alternate" type="application/rss+xml" title="Sesquipedalia" href="../feed.xml">
+        <link rel="alternate" type="application/atom+xml" title="Sesquipedalia" href="../atom.xml">
+        <link rel="shortcut icon" href="../site/favicon.ico">
+    </head>
+    <body>
+        <div id="header">
+            <div id="logo">
+                <a href="../">Sesquipedalia</a>
+            </div>
+            <div id="navigation">
+                <a href="../index.html">Home</a>
+                <a href="../about.html">About</a>
+                <a href="../contact.html">Contact</a>
+                <a href="../archive.html">Archive</a>
+            </div>
+        </div>
+
+        <div id="content">
+            <h1>Controlling magnolia implicit priorities in Scala</h1>
+
+            <div class="info">
+    Posted on April 26, 2020
+    
+</div>
+
+<p>I recently added <a href="https://github.com/propensive/magnolia">Magnolia</a> based automated instance generation to my <a href="https://leigh-perry.github.io/posts/2019-09-01-conduction.html">configuration library</a>. Magnolia can save the boilerplate of describing your configuration descriptors, and is pretty convenient. However, I didn’t want to bake it into the base library <code>conduction-core</code>. I wanted it to be an opt-in addition, called <code>conduction-magnolia</code>.</p>
+<h1 id="the-magnolia-native-way">The Magnolia-native way</h1>
+<p>If you bake Magnolia support right into the class you want to provide automatic derivations for, everything is easy.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb1-1" title="1"><span class="kw">trait</span> Configured[F, T] ...</a>
+<a class="sourceLine" id="cb1-2" title="2"></a>
+<a class="sourceLine" id="cb1-3" title="3"><span class="kw">object</span> Configured {</a>
+<a class="sourceLine" id="cb1-4" title="4"></a>
+<a class="sourceLine" id="cb1-5" title="5">  <span class="co">/**</span> Specific instances <span class="co">*/</span></a>
+<a class="sourceLine" id="cb1-6" title="6">  <span class="kw">implicit</span> <span class="kw">def</span> configuredOption[F[_], A]: Configured[F, Option[A]] = ...</a>
+<a class="sourceLine" id="cb1-7" title="7"></a>
+<a class="sourceLine" id="cb1-8" title="8">  <span class="co">/**</span> Now Magnolia generation support <span class="co">*/</span></a>
+<a class="sourceLine" id="cb1-9" title="9">  <span class="kw">type</span> Typeclass[T] = Configured[F, T]</a>
+<a class="sourceLine" id="cb1-10" title="10">  <span class="kw">def</span> combine[T](caseClass: CaseClass[Typeclass, T]): Typeclass[T] = ...</a>
+<a class="sourceLine" id="cb1-11" title="11">  <span class="kw">def</span> dispatch[T](sealedTrait: SealedTrait[Typeclass, T]): Typeclass[T] = ...</a>
+<a class="sourceLine" id="cb1-12" title="12">  <span class="kw">implicit</span> <span class="kw">def</span> gen[T]: Typeclass[T] = macro Magnolia.<span class="fu">gen</span>[T]</a>
+<a class="sourceLine" id="cb1-13" title="13"></a>
+<a class="sourceLine" id="cb1-14" title="14">  :</a>
+<a class="sourceLine" id="cb1-15" title="15">}</a></code></pre></div>
+<p>Because the specific, hand-coded instances are baked into the <code>Configured</code> companion object, there is a natural priority of implicits – there is a specific instances available, Magnolia is not called upon to create an instance. For anything else, Magnolia’s automatically generated instance would be used.</p>
+<p>This is all via the magic of Scala implicits and their priority scheme.</p>
+<h1 id="opt-in-automated-instances">Opt-in automated Instances</h1>
+<p>Putting the Magnolia support in an external class:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb2-1" title="1"><span class="kw">object</span> MagnoliaConfigSupport[F[_]: Applicative] {</a>
+<a class="sourceLine" id="cb2-2" title="2"></a>
+<a class="sourceLine" id="cb2-3" title="3">  <span class="kw">type</span> Typeclass[T] = Configured[F, T]</a>
+<a class="sourceLine" id="cb2-4" title="4">  <span class="kw">def</span> combine[T](caseClass: CaseClass[Typeclass, T]): Typeclass[T] = ...</a>
+<a class="sourceLine" id="cb2-5" title="5">  <span class="kw">def</span> dispatch[T](sealedTrait: SealedTrait[Typeclass, T]): Typeclass[T] = ...</a>
+<a class="sourceLine" id="cb2-6" title="6">  <span class="kw">implicit</span> <span class="kw">def</span> gen[T]: Typeclass[T] = macro Magnolia.<span class="fu">gen</span>[T]</a>
+<a class="sourceLine" id="cb2-7" title="7"></a>
+<a class="sourceLine" id="cb2-8" title="8">}</a></code></pre></div>
+<p>means that to use it, you need to <code>import MagnoliaConfigSupport._</code>, whereas previously, the implicit instances were always available from the companion object. The unexpected downside of this is that the<code>MagnoliaConfigSupport</code> instances are always used. In the example above, I have <code>configuredOption</code>, which provides a specialised implementation for <code>Option[A]</code>, However, I found that tests were failing because my specialised implementation was not being used. <code>import MagnoliaConfigSupport._</code> was able to synthesise an implicit instance because, internally, <code>Option</code> is just another data structure. But the synthesised instance was not compatible with how I want <code>Option</code> support to work.</p>
+<h2 id="analysis">Analysis</h2>
+<p>Why does it work when baked in in the Magnolia-native way? Because the Magnolia instances are in the same companion object as the specialised instance, and the compile will always choose the specialisation. But when they are separate, the compiler stops looking as soon as it can fulfill an instance, and never gets around to looking in the companion object. It surprised me too.</p>
+<h2 id="solution">Solution</h2>
+<p>To get around this, I had to establish a priority of specialised instances over Magnolia-generated. I refactored <code>MagnoliaConfigSupport</code> to reassert the natural priority of things:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb3-1" title="1"><span class="co">/**</span> Implicit resolution for any F<span class="co">[</span>_<span class="co">]</span> with Applicative <span class="co">*/</span></a>
+<a class="sourceLine" id="cb3-2" title="2"><span class="kw">abstract</span> <span class="kw">class</span> AutoConfigInstances[F[_]: Applicative] <span class="kw">extends</span> MagnoliaConfigSupport[F] {</a>
+<a class="sourceLine" id="cb3-3" title="3"></a>
+<a class="sourceLine" id="cb3-4" title="4">  <span class="co">// Explicitly re-expose the companion object implicits at higher priority</span></a>
+<a class="sourceLine" id="cb3-5" title="5">  <span class="kw">implicit</span> <span class="kw">def</span> configuredA[F[_]: Monad, A: Conversion]: Configured[F, A] =</a>
+<a class="sourceLine" id="cb3-6" title="6">    Configured.<span class="fu">configuredA</span></a>
+<a class="sourceLine" id="cb3-7" title="7"></a>
+<a class="sourceLine" id="cb3-8" title="8">  <span class="kw">implicit</span> <span class="kw">def</span> configuredOption[F[_], A](<span class="kw">implicit</span> F: Functor[F], A: Configured[F, A]): Configured[F, Option[A]] =</a>
+<a class="sourceLine" id="cb3-9" title="9">    Configured.<span class="fu">configuredOption</span></a>
+<a class="sourceLine" id="cb3-10" title="10"></a>
+<a class="sourceLine" id="cb3-11" title="11">  <span class="kw">implicit</span> <span class="kw">def</span> configuredList[F[_], A](<span class="kw">implicit</span> F: Monad[F], A: Configured[F, A]): Configured[F, List[A]] =</a>
+<a class="sourceLine" id="cb3-12" title="12">    Configured.<span class="fu">configuredList</span></a>
+<a class="sourceLine" id="cb3-13" title="13"></a>
+<a class="sourceLine" id="cb3-14" title="14">  <span class="kw">implicit</span> <span class="kw">def</span> configuredEither[F[_], A, B](</a>
+<a class="sourceLine" id="cb3-15" title="15">    <span class="kw">implicit</span> F: Monad[F],</a>
+<a class="sourceLine" id="cb3-16" title="16">    A: Configured[F, A],</a>
+<a class="sourceLine" id="cb3-17" title="17">    B: Configured[F, B]</a>
+<a class="sourceLine" id="cb3-18" title="18">  ): Configured[F, Either[A, B]] =</a>
+<a class="sourceLine" id="cb3-19" title="19">    Configured.<span class="fu">configuredEither</span></a>
+<a class="sourceLine" id="cb3-20" title="20"></a>
+<a class="sourceLine" id="cb3-21" title="21">}</a>
+<a class="sourceLine" id="cb3-22" title="22"></a>
+<a class="sourceLine" id="cb3-23" title="23"><span class="kw">private</span>[magnolia] <span class="kw">abstract</span> <span class="kw">class</span> MagnoliaConfigSupport[F[_]: Applicative] {</a>
+<a class="sourceLine" id="cb3-24" title="24"></a>
+<a class="sourceLine" id="cb3-25" title="25">  <span class="kw">type</span> Typeclass[T] = Configured[F, T]</a>
+<a class="sourceLine" id="cb3-26" title="26">  <span class="kw">def</span> combine[T](caseClass: CaseClass[Typeclass, T]): Typeclass[T] = ...</a>
+<a class="sourceLine" id="cb3-27" title="27">  <span class="kw">def</span> dispatch[T](sealedTrait: SealedTrait[Typeclass, T]): Typeclass[T] = ...</a>
+<a class="sourceLine" id="cb3-28" title="28">  <span class="kw">implicit</span> <span class="kw">def</span> gen[T]: Typeclass[T] = macro Magnolia.<span class="fu">gen</span>[T]</a>
+<a class="sourceLine" id="cb3-29" title="29"></a>
+<a class="sourceLine" id="cb3-30" title="30">}</a></code></pre></div>
+<p>Through sub-classing, this layers the specialised implementations <em>ahead in priority</em> of the Magnolia implementations.</p>
+<p>I then added an object suitable for importing into client code.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode scala"><code class="sourceCode scala"><a class="sourceLine" id="cb4-1" title="1"><span class="kw">object</span> AutoConfigInstancesIO <span class="kw">extends</span> AutoConfigInstances[IO]</a></code></pre></div>
+<p>This way, via <code>import AutoConfigInstancesIO._</code>, a user gets well-behaved implicit resolution, that resolves the same way as a Magnolia-native implementation would have.</p>
+
+        </div>
+        <div id="footer">
+            Site created with <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </div>
+    </body>
+</html>

@@ -7,8 +7,16 @@
         <description><![CDATA[Ephema is a software engineering blog by Leigh Perry]]></description>
         <atom:link href="https://leigh-perry.github.io/feed.xml" rel="self"
                    type="application/rss+xml" />
-        <lastBuildDate>Wed, 20 Nov 2019 00:00:00 UT</lastBuildDate>
+        <lastBuildDate>Sun, 26 Apr 2020 00:00:00 UT</lastBuildDate>
         <item>
+    <title>Controlling magnolia implicit priorities in Scala</title>
+    <link>https://leigh-perry.github.io/posts/2020-04-26-magnolia-implicits.html</link>
+    <description><![CDATA[Another post from Leigh]]></description>
+    <pubDate>Sun, 26 Apr 2020 00:00:00 UT</pubDate>
+    <guid>https://leigh-perry.github.io/posts/2020-04-26-magnolia-implicits.html</guid>
+    <dc:creator>Leigh Perry</dc:creator>
+</item>
+<item>
     <title>Monoidal aggregation via Traverse</title>
     <link>https://leigh-perry.github.io/posts/2019-11-20-monoids-viatraverse.html</link>
     <description><![CDATA[Another post from Leigh]]></description>
@@ -78,14 +86,6 @@
     <description><![CDATA[Another post from Leigh]]></description>
     <pubDate>Wed, 03 Apr 2019 00:00:00 UT</pubDate>
     <guid>https://leigh-perry.github.io/posts/2019-04-03-fix-haskell-to-scala.html</guid>
-    <dc:creator>Leigh Perry</dc:creator>
-</item>
-<item>
-    <title>Deriving Haskell's fix function</title>
-    <link>https://leigh-perry.github.io/posts/2019-04-01-fix-haskell-function.html</link>
-    <description><![CDATA[Another post from Leigh]]></description>
-    <pubDate>Mon, 01 Apr 2019 00:00:00 UT</pubDate>
-    <guid>https://leigh-perry.github.io/posts/2019-04-01-fix-haskell-function.html</guid>
     <dc:creator>Leigh Perry</dc:creator>
 </item>
 

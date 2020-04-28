@@ -8,8 +8,16 @@
         <name>Leigh Perry</name>
         <email>lperry.breakpoint@gmail.com</email>
     </author>
-    <updated>2019-11-20T00:00:00Z</updated>
+    <updated>2020-04-26T00:00:00Z</updated>
     <entry>
+    <title>Controlling magnolia implicit priorities in Scala</title>
+    <link href="https://leigh-perry.github.io/posts/2020-04-26-magnolia-implicits.html" />
+    <id>https://leigh-perry.github.io/posts/2020-04-26-magnolia-implicits.html</id>
+    <published>2020-04-26T00:00:00Z</published>
+    <updated>2020-04-26T00:00:00Z</updated>
+    <summary type="html"><![CDATA[Another post from Leigh]]></summary>
+</entry>
+<entry>
     <title>Monoidal aggregation via Traverse</title>
     <link href="https://leigh-perry.github.io/posts/2019-11-20-monoids-viatraverse.html" />
     <id>https://leigh-perry.github.io/posts/2019-11-20-monoids-viatraverse.html</id>
@@ -79,14 +87,6 @@
     <id>https://leigh-perry.github.io/posts/2019-04-03-fix-haskell-to-scala.html</id>
     <published>2019-04-03T00:00:00Z</published>
     <updated>2019-04-03T00:00:00Z</updated>
-    <summary type="html"><![CDATA[Another post from Leigh]]></summary>
-</entry>
-<entry>
-    <title>Deriving Haskell's fix function</title>
-    <link href="https://leigh-perry.github.io/posts/2019-04-01-fix-haskell-function.html" />
-    <id>https://leigh-perry.github.io/posts/2019-04-01-fix-haskell-function.html</id>
-    <published>2019-04-01T00:00:00Z</published>
-    <updated>2019-04-01T00:00:00Z</updated>
     <summary type="html"><![CDATA[Another post from Leigh]]></summary>
 </entry>
 
