@@ -1,10 +1,10 @@
 ---
-title: Controlling magnolia implicit priorities in Scala 
+title: Controlling Magnolia implicit priorities in Scala 
 ---
 
 I recently added [Magnolia](https://github.com/propensive/magnolia) based automated instance generation
-to my [configuration library](https://leigh-perry.github.io/posts/2019-09-01-conduction.html).
-Magnolia can save the boilerplate of describing your configuration descriptors, and is pretty convenient.
+to my [Conduction](https://leigh-perry.github.io/posts/2019-09-01-conduction.html) configuration library.
+Magnolia can save the boilerplate of describing your configuration descriptors, which is pretty convenient.
 However, I didn't want to bake it into the base library `conduction-core`.
 I wanted it to be an opt-in addition, called `conduction-magnolia`.
 
@@ -31,16 +31,16 @@ object Configured {
 }
 ``` 
 
-Because the specific, hand-coded instances are baked into the `Configured` companion object,
-there is a natural priority of implicits – there is a specific instances available, Magnolia is not
-called upon to create an instance. For anything else, Magnolia's automatically generated instance
+Because the specific, hand-coded instances are baked into the `Configured` companion object alongside the Magnolia support,
+there is a natural priority of implicits. Ifthere is a specific instance available, Magnolia is not
+called upon to create an instance. Where a specific instance does not exist, Magnolia's automatically generated instance
 would be used. 
 
 This is all via the magic of Scala implicits and their priority scheme.
 
 # Opt-in automated Instances
 
-Putting the Magnolia support in an external class:
+Putting the Magnolia support in an external class, as I intended:
 ```scala
 object MagnoliaConfigSupport[F[_]: Applicative] {
 
@@ -53,24 +53,28 @@ object MagnoliaConfigSupport[F[_]: Applicative] {
 ```
 means that to use it, you need to `import MagnoliaConfigSupport._`, whereas previously, the implicit instances
 were always available from the companion object. 
-The unexpected downside of this is that the`MagnoliaConfigSupport` instances are always used.
-In the example above, I have `configuredOption`, which provides a specialised implementation for `Option[A]`,
+The unexpected downside of this is that the`MagnoliaConfigSupport` instances are always used,
+even when there is a specific instance available in the `Configured` companion object.
+
+In the example above, I have `configuredOption`, which provides a specialised implementation for `Option[A]`.
 However, I found that tests were failing because my specialised implementation was not being used.
-`import MagnoliaConfigSupport._` was able to synthesise an implicit instance because, internally, `Option`
-is just another data structure. But the synthesised instance was not compatible with how I want `Option`
-support to work.
+Via `import MagnoliaConfigSupport._`, Magnolia was able to synthesise an implicit instance because, internally, `Option`
+`Option` just another data structure.
+But the synthesised instance was not compatible with how I want `Option` support to work.
 
 ## Analysis
 
-Why does it work when baked in in the Magnolia-native way?
-Because the Magnolia instances are in the same companion object as the specialised instance,
+Why do implicits resolve sensibly when baked in in the Magnolia-native way?
+It is because the Magnolia instances are in the same companion object as the specialised instance,
 and the compile will always choose the specialisation.
-But when they are separate, the compiler stops looking as soon as it can fulfill an instance, 
-and never gets around to looking in the companion object. It surprised me too.
+But when they are separate, the compiler stops looking as soon as it can fulfill an instance, via Magnolia, 
+and never gets around to looking in the companion object.
+
+It surprised me too.
 
 ## Solution
 
-To get around this, I had to establish a priority of specialised instances over Magnolia-generated.
+To get around this, I had to enable the choice of specialised instances over Magnolia-generated.
 I refactored `MagnoliaConfigSupport` to reassert the natural priority of things:
 
 ```scala
@@ -107,11 +111,12 @@ private[magnolia] abstract class MagnoliaConfigSupport[F[_]: Applicative] {
 ```
 
 Through sub-classing, this layers the specialised implementations *ahead in priority* of the Magnolia implementations.
+These simply delegate to the `Configured` companion object instances.
 
 I then added an object suitable for importing into client code.
 ```scala
 object AutoConfigInstancesIO extends AutoConfigInstances[IO]
 ```
 
-This way, via `import AutoConfigInstancesIO._`, a user gets well-behaved implicit resolution,
+Now, via `import AutoConfigInstancesIO._`, a user gets well-behaved implicit resolution,
 that resolves the same way as a Magnolia-native implementation would have.
